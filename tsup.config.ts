@@ -2,7 +2,9 @@ import { defineConfig } from 'tsup';
 
 export default defineConfig({
   // Single UMD build - browser ready
-  entry: ['src/index.ts'],
+  entry: {
+    gbsdk: 'src/index.ts',
+  },
   format: ['iife'],
   minify: true,
   sourcemap: false,
