@@ -77,12 +77,15 @@ export class GAMAdapter implements AdAdapter {
   /**
    * Play an ad using Google Ad Manager
    */
-  async play(config: GAMConfig, ctx: PlayCtx): Promise<'ok' | 'skipped' | 'no_fill' | 'error' | 'timeout'> {
+  async play(
+    config: GAMConfig,
+    ctx: PlayCtx
+  ): Promise<'ok' | 'skipped' | 'no_fill' | 'error' | 'timeout'> {
     if (!this.loaded) {
       await this.load();
     }
 
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const divId = `gam-ad-${++this.slotCounter}`;
       const timeout = config.timeout || 3000;
       let timeoutHandle: number | null = null;
@@ -95,7 +98,8 @@ export class GAMAdapter implements AdAdapter {
       // Create ad container
       const adContainer = document.createElement('div');
       adContainer.id = divId;
-      adContainer.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;';
+      adContainer.style.cssText =
+        'position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;';
       ctx.mount.overlay.appendChild(adContainer);
 
       window.googletag!.cmd.push(() => {
@@ -158,7 +162,7 @@ export class GAMAdapter implements AdAdapter {
                 console.log('GAMAdapter: Slot render ended', {
                   isEmpty: event.isEmpty,
                   size: event.size,
-                  advertiserId: event.advertiserId
+                  advertiserId: event.advertiserId,
                 });
               }
 
@@ -180,27 +184,35 @@ export class GAMAdapter implements AdAdapter {
           });
 
           // Impression viewable event
-          const impressionViewableListener = pubads.addEventListener('impressionViewable', (event: any) => {
-            if (event.slot === this.currentSlot) {
-              if (ctx.debug) {
-                console.log('GAMAdapter: Impression viewable');
-              }
+          const impressionViewableListener = pubads.addEventListener(
+            'impressionViewable',
+            (event: any) => {
+              if (event.slot === this.currentSlot) {
+                if (ctx.debug) {
+                  console.log('GAMAdapter: Impression viewable');
+                }
 
-              if (!adStarted) {
-                adStarted = true;
-                ctx.onEvent('started', {});
+                if (!adStarted) {
+                  adStarted = true;
+                  ctx.onEvent('started', {});
+                }
               }
             }
-          });
+          );
 
           // Slot visibility changed event
-          const visibilityChangedListener = pubads.addEventListener('slotVisibilityChanged', (event: any) => {
-            if (event.slot === this.currentSlot) {
-              if (ctx.debug) {
-                console.log('GAMAdapter: Visibility changed', { inViewPercentage: event.inViewPercentage });
+          const visibilityChangedListener = pubads.addEventListener(
+            'slotVisibilityChanged',
+            (event: any) => {
+              if (event.slot === this.currentSlot) {
+                if (ctx.debug) {
+                  console.log('GAMAdapter: Visibility changed', {
+                    inViewPercentage: event.inViewPercentage,
+                  });
+                }
               }
             }
-          });
+          );
 
           // Display the ad
           window.googletag!.display(divId);
@@ -247,7 +259,6 @@ export class GAMAdapter implements AdAdapter {
               }
             }, estimatedDuration);
           }
-
         } catch (error) {
           if (ctx.debug) {
             console.error('GAMAdapter: Error', error);
@@ -295,4 +306,3 @@ export class GAMAdapter implements AdAdapter {
     this.loadPromise = null;
   }
 }
-

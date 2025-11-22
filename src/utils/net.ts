@@ -19,16 +19,16 @@ export function loadScriptOnce(src: string): Promise<void> {
     const script = document.createElement('script');
     script.src = src;
     script.async = true;
-    
+
     script.onload = () => {
       loadedScripts.add(src);
       resolve();
     };
-    
+
     script.onerror = () => {
       reject(new Error(`Failed to load script: ${src}`));
     };
-    
+
     document.head.appendChild(script);
   });
 }
@@ -38,13 +38,13 @@ export function loadScriptOnce(src: string): Promise<void> {
  */
 export function appendQuery(url: string, params: Record<string, string | number>): string {
   const urlObj = new URL(url);
-  
+
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null) {
       urlObj.searchParams.set(key, String(value));
     }
   });
-  
+
   return urlObj.toString();
 }
 
@@ -52,28 +52,28 @@ export function appendQuery(url: string, params: Record<string, string | number>
  * Simple fetch wrapper with timeout and better error handling
  */
 export async function fetchWithTimeout(
-  url: string, 
+  url: string,
   options: RequestOptions = {}
 ): Promise<NetworkResponse> {
   const { timeout = 10000, ...fetchOptions } = options;
-  
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
-  
+
   try {
     const response = await fetch(url, {
       ...fetchOptions,
       signal: controller.signal,
     });
-    
+
     clearTimeout(timeoutId);
-    
+
     // Convert Headers to plain object
     const headers: Record<string, string> = {};
     response.headers.forEach((value, key) => {
       headers[key.toLowerCase()] = value;
     });
-    
+
     return {
       ok: response.ok,
       status: response.status,
@@ -84,11 +84,11 @@ export async function fetchWithTimeout(
     };
   } catch (error) {
     clearTimeout(timeoutId);
-    
+
     if (error instanceof Error && error.name === 'AbortError') {
       throw new Error(`Request timeout: ${url}`);
     }
-    
+
     throw error;
   }
 }
@@ -108,16 +108,18 @@ export function validateHttpsUrl(url: string): void {
  */
 export function validateAllowedDomain(url: string, allowedDomains: string[]): void {
   if (allowedDomains.length === 0) return;
-  
+
   const urlObj = new URL(url);
   const hostname = urlObj.hostname;
-  
+
   const isAllowed = allowedDomains.some(domain => {
     // Exact match or subdomain match
     return hostname === domain || hostname.endsWith(`.${domain}`);
   });
-  
+
   if (!isAllowed) {
-    throw new Error(`GBSDK: Domain not allowed: ${hostname}. Allowed: ${allowedDomains.join(', ')}`);
+    throw new Error(
+      `GBSDK: Domain not allowed: ${hostname}. Allowed: ${allowedDomains.join(', ')}`
+    );
   }
 }

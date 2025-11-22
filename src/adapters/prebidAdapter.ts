@@ -80,12 +80,15 @@ export class PrebidAdapter implements AdAdapter {
   /**
    * Play an ad using Prebid header bidding
    */
-  async play(config: PrebidConfig, ctx: PlayCtx): Promise<'ok' | 'skipped' | 'no_fill' | 'error' | 'timeout'> {
+  async play(
+    config: PrebidConfig,
+    ctx: PlayCtx
+  ): Promise<'ok' | 'skipped' | 'no_fill' | 'error' | 'timeout'> {
     if (!this.loaded) {
       await this.load();
     }
 
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const adUnitCode = `gbsdk-${ctx.kind}-${++this.adUnitCounter}`;
       const timeout = config.timeout || 2000;
 
@@ -104,10 +107,10 @@ export class PrebidAdapter implements AdAdapter {
               filterSettings: {
                 iframe: {
                   bidders: '*',
-                  filter: 'include'
-                }
-              }
-            }
+                  filter: 'include',
+                },
+              },
+            },
           });
 
           // Build ad unit
@@ -121,12 +124,12 @@ export class PrebidAdapter implements AdAdapter {
                 protocols: [2, 3, 5, 6],
                 playbackmethod: [2],
                 skip: ctx.kind === 'interstitial' ? 1 : 0,
-              }
+              },
             },
             bids: config.bidders.map(bidder => ({
               bidder: bidder.name,
-              params: bidder.params
-            }))
+              params: bidder.params,
+            })),
           };
 
           // Add ad unit
@@ -138,7 +141,7 @@ export class PrebidAdapter implements AdAdapter {
             timeout,
             bidsBackHandler: (bids: any) => {
               this.handleBidsBack(adUnitCode, bids, ctx, resolve);
-            }
+            },
           });
 
           // Timeout fallback
@@ -149,7 +152,6 @@ export class PrebidAdapter implements AdAdapter {
             this.cleanup(adUnitCode);
             resolve('timeout');
           }, timeout + 500);
-
         } catch (error) {
           if (ctx.debug) {
             console.error('PrebidAdapter: Error', error);
@@ -208,13 +210,12 @@ export class PrebidAdapter implements AdAdapter {
           cpm: winningBid.cpm,
           bidder: winningBid.bidder,
           vastUrl,
-          hasVastXml: !!vastXml
+          hasVastXml: !!vastXml,
         });
       }
 
       // Play the ad using IMA adapter (we'll pass VAST URL/XML to it)
       this.playVastAd(vastUrl, vastXml, ctx, resolve);
-
     } catch (error) {
       if (ctx.debug) {
         console.error('PrebidAdapter: Error handling bids', error);
@@ -279,4 +280,3 @@ export class PrebidAdapter implements AdAdapter {
     this.loadPromise = null;
   }
 }
-

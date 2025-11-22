@@ -205,5 +205,3 @@ export type GameMetadata = {
   uploadedAt?: string;
   detectionMethod?: 'injected' | 'meta_tags' | 'url';
 };
-
-

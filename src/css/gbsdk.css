@@ -78,7 +78,7 @@
     width: 95vw;
     max-height: 80vh;
   }
-  
+
   .gbsdk-close {
     top: 12px;
     right: 12px;
@@ -101,7 +101,7 @@
   .gbsdk-overlay {
     background: rgba(0, 0, 0, 0.95);
   }
-  
+
   .gbsdk-close {
     background: #000;
     border: 2px solid #fff;
@@ -113,11 +113,11 @@
   .gbsdk-close {
     transition: none;
   }
-  
+
   .gbsdk-close:hover {
     transform: none;
   }
-  
+
   .gbsdk-close:active {
     transform: none;
   }

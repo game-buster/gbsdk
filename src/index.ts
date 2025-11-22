@@ -1,7 +1,7 @@
 /**
  * GBSDK - GameBuster Ads SDK
  * Production-ready, zero-dependency in-game ads SDK
- * 
+ *
  * @version 1.0.0
  * @author GameBuster
  * @license MIT

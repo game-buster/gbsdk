@@ -61,7 +61,9 @@ export class ImaVastAdapter implements Adapter {
   private adsManager: any = null;
   private adDisplayContainer: any = null;
   private currentPlayCtx: PlayCtx | null = null;
-  private playPromiseResolve: ((result: 'ok' | 'skipped' | 'no_fill' | 'error' | 'timeout') => void) | null = null;
+  private playPromiseResolve:
+    | ((result: 'ok' | 'skipped' | 'no_fill' | 'error' | 'timeout') => void)
+    | null = null;
   private playTimeout: number | null = null;
 
   /**
@@ -92,8 +94,11 @@ export class ImaVastAdapter implements Adapter {
   /**
    * Play an ad using the given tag URL and context
    */
-  async play(tagUrl: string, ctx: PlayCtx): Promise<'ok' | 'skipped' | 'no_fill' | 'error' | 'timeout'> {
-    return new Promise((resolve) => {
+  async play(
+    tagUrl: string,
+    ctx: PlayCtx
+  ): Promise<'ok' | 'skipped' | 'no_fill' | 'error' | 'timeout'> {
+    return new Promise(resolve => {
       this.currentPlayCtx = ctx;
       this.playPromiseResolve = resolve;
 
@@ -184,7 +189,10 @@ export class ImaVastAdapter implements Adapter {
   /**
    * Build ad tag URL with TCF and other parameters
    */
-  private buildAdTagUrl(baseUrl: string, tc?: { gdpr?: 0 | 1; tcString?: string; npa: 0 | 1 }): string {
+  private buildAdTagUrl(
+    baseUrl: string,
+    tc?: { gdpr?: 0 | 1; tcString?: string; npa: 0 | 1 }
+  ): string {
     const params: Record<string, string | number> = {
       correlator: Date.now(),
     };
@@ -218,49 +226,40 @@ export class ImaVastAdapter implements Adapter {
     this.adsManager = event.getAdsManager(this.currentPlayCtx!.mount.video, adsRenderingSettings);
 
     // Set up ads manager event listeners
-    this.adsManager.addEventListener(
-      window.google!.ima.AdEvent.Type.LOADED,
-      () => this.onAdEvent('loaded')
+    this.adsManager.addEventListener(window.google!.ima.AdEvent.Type.LOADED, () =>
+      this.onAdEvent('loaded')
     );
 
-    this.adsManager.addEventListener(
-      window.google!.ima.AdEvent.Type.STARTED,
-      () => this.onAdEvent('started')
+    this.adsManager.addEventListener(window.google!.ima.AdEvent.Type.STARTED, () =>
+      this.onAdEvent('started')
     );
 
-    this.adsManager.addEventListener(
-      window.google!.ima.AdEvent.Type.FIRST_QUARTILE,
-      () => this.onAdEvent('first_quartile')
+    this.adsManager.addEventListener(window.google!.ima.AdEvent.Type.FIRST_QUARTILE, () =>
+      this.onAdEvent('first_quartile')
     );
 
-    this.adsManager.addEventListener(
-      window.google!.ima.AdEvent.Type.MIDPOINT,
-      () => this.onAdEvent('midpoint')
+    this.adsManager.addEventListener(window.google!.ima.AdEvent.Type.MIDPOINT, () =>
+      this.onAdEvent('midpoint')
     );
 
-    this.adsManager.addEventListener(
-      window.google!.ima.AdEvent.Type.THIRD_QUARTILE,
-      () => this.onAdEvent('third_quartile')
+    this.adsManager.addEventListener(window.google!.ima.AdEvent.Type.THIRD_QUARTILE, () =>
+      this.onAdEvent('third_quartile')
     );
 
-    this.adsManager.addEventListener(
-      window.google!.ima.AdEvent.Type.COMPLETE,
-      () => this.onAdEvent('complete')
+    this.adsManager.addEventListener(window.google!.ima.AdEvent.Type.COMPLETE, () =>
+      this.onAdEvent('complete')
     );
 
-    this.adsManager.addEventListener(
-      window.google!.ima.AdEvent.Type.SKIPPED,
-      () => this.onAdEvent('skipped')
+    this.adsManager.addEventListener(window.google!.ima.AdEvent.Type.SKIPPED, () =>
+      this.onAdEvent('skipped')
     );
 
-    this.adsManager.addEventListener(
-      window.google!.ima.AdEvent.Type.ALL_ADS_COMPLETED,
-      () => this.onAdEvent('all_completed')
+    this.adsManager.addEventListener(window.google!.ima.AdEvent.Type.ALL_ADS_COMPLETED, () =>
+      this.onAdEvent('all_completed')
     );
 
-    this.adsManager.addEventListener(
-      window.google!.ima.AdErrorEvent.Type.AD_ERROR,
-      (event: any) => this.onAdError(event)
+    this.adsManager.addEventListener(window.google!.ima.AdErrorEvent.Type.AD_ERROR, (event: any) =>
+      this.onAdError(event)
     );
 
     try {
@@ -271,7 +270,7 @@ export class ImaVastAdapter implements Adapter {
       if (this.currentPlayCtx!.debug) {
         console.log('ImaVastAdapter: Initializing ads manager', {
           width: videoDims.width,
-          height: videoDims.height
+          height: videoDims.height,
         });
       }
 
@@ -290,7 +289,11 @@ export class ImaVastAdapter implements Adapter {
       if (this.currentPlayCtx!.debug) {
         console.error('ImaVastAdapter: Failed to start ads manager', error);
       }
-      this.onAdError({ getError: () => ({ getMessage: () => error instanceof Error ? error.message : 'Init error' }) });
+      this.onAdError({
+        getError: () => ({
+          getMessage: () => (error instanceof Error ? error.message : 'Init error'),
+        }),
+      });
     }
   }
 
@@ -350,13 +353,13 @@ export class ImaVastAdapter implements Adapter {
           errorType,
           vastErrorCode,
           innerError,
-          fullError: error
+          fullError: error,
         });
       }
       this.currentPlayCtx.onEvent('error', {
         error: errorMessage,
         errorCode,
-        errorType
+        errorType,
       });
     }
 

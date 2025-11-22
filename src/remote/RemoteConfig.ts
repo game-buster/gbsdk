@@ -96,7 +96,7 @@ export class RemoteConfig {
    */
   private async fetchFromNetwork(etag?: string): Promise<GBRemoteConfig | null> {
     const headers: Record<string, string> = {
-      'Accept': 'application/json',
+      Accept: 'application/json',
     };
 
     // Add ETag for conditional request
@@ -201,20 +201,26 @@ export class RemoteConfig {
     }
 
     // Validate optional fields
-    if (config.cooldownSec !== undefined && (typeof config.cooldownSec !== 'number' || config.cooldownSec < 0)) {
+    if (
+      config.cooldownSec !== undefined &&
+      (typeof config.cooldownSec !== 'number' || config.cooldownSec < 0)
+    ) {
       throw new Error('Invalid config: cooldownSec must be a non-negative number');
     }
 
-    if (config.sessionCap !== undefined && (typeof config.sessionCap !== 'number' || config.sessionCap < 0)) {
+    if (
+      config.sessionCap !== undefined &&
+      (typeof config.sessionCap !== 'number' || config.sessionCap < 0)
+    ) {
       throw new Error('Invalid config: sessionCap must be a non-negative number');
     }
 
     // Validate ad configurations
-    if (config.interstitial && (!Array.isArray(config.interstitial.tags))) {
+    if (config.interstitial && !Array.isArray(config.interstitial.tags)) {
       throw new Error('Invalid config: interstitial.tags must be an array');
     }
 
-    if (config.rewarded && (!Array.isArray(config.rewarded.tags))) {
+    if (config.rewarded && !Array.isArray(config.rewarded.tags)) {
       throw new Error('Invalid config: rewarded.tags must be an array');
     }
   }

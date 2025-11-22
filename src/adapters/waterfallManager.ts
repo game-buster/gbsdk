@@ -30,7 +30,7 @@ export class WaterfallManager {
     if (ctx.debug) {
       console.log('WaterfallManager: Starting waterfall', {
         sources: sources.map(s => s.type),
-        kind: ctx.kind
+        kind: ctx.kind,
       });
     }
 
@@ -40,7 +40,7 @@ export class WaterfallManager {
 
       if (ctx.debug) {
         console.log(`WaterfallManager: Trying source ${i + 1}/${sources.length}`, {
-          type: source.type
+          type: source.type,
         });
       }
 
@@ -57,7 +57,7 @@ export class WaterfallManager {
         if (ctx.debug) {
           console.log(`WaterfallManager: Source ${i + 1} failed`, {
             type: source.type,
-            result
+            result,
           });
         }
 
@@ -87,13 +87,13 @@ export class WaterfallManager {
     switch (source.type) {
       case 'prebid':
         return this.tryPrebid(source, ctx);
-      
+
       case 'gam':
         return this.tryGAM(source, ctx);
-      
+
       case 'vast':
         return this.tryVAST(source, ctx);
-      
+
       default:
         if (ctx.debug) {
           console.warn('WaterfallManager: Unknown source type', { type: source.type });
@@ -248,4 +248,3 @@ export class WaterfallManager {
     }
   }
 }
-

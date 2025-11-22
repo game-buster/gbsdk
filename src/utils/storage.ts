@@ -41,7 +41,7 @@ export const sessionStorage = new SafeStorageAdapter(window.sessionStorage);
 export function getStoredJSON<T>(storage: StorageAdapter, key: string): T | null {
   const value = storage.getItem(key);
   if (!value) return null;
-  
+
   try {
     return JSON.parse(value) as T;
   } catch (error) {

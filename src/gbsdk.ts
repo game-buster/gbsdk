@@ -69,7 +69,7 @@ export class GBSDK extends EventEmitter {
     if (this.state.config.debug) {
       console.log(`GBSDK v${SDK_VERSION}: Initializing with auto-detected metadata:`, {
         gameMetadata,
-        config: this.state.config
+        config: this.state.config,
       });
     }
 
@@ -168,8 +168,6 @@ export class GBSDK extends EventEmitter {
 
     return true;
   }
-
-
 
   /**
    * Track game started event
@@ -315,7 +313,10 @@ export class GBSDK extends EventEmitter {
   /**
    * Play a single ad tag
    */
-  private async playAdTag(tagUrl: string, kind: AdKind): Promise<'ok' | 'skipped' | 'no_fill' | 'error' | 'timeout'> {
+  private async playAdTag(
+    tagUrl: string,
+    kind: AdKind
+  ): Promise<'ok' | 'skipped' | 'no_fill' | 'error' | 'timeout'> {
     if (!this.state.adapter || !this.state.overlay) {
       return 'error';
     }
@@ -494,8 +495,6 @@ export class GBSDK extends EventEmitter {
     document.addEventListener('keydown', handleKeydown);
   }
 
-
-
   /**
    * Detect game metadata from various sources
    */
@@ -546,11 +545,15 @@ export class GBSDK extends EventEmitter {
 
     return {
       gameId,
-      gameTitle: getMetaContent('gbsdk:game-title') || getMetaContent('game-title') || document.title,
+      gameTitle:
+        getMetaContent('gbsdk:game-title') || getMetaContent('game-title') || document.title,
       category: getMetaContent('gbsdk:category') || getMetaContent('game-category') || undefined,
-      tags: getMetaContent('gbsdk:tags')?.split(',').map(t => t.trim()) || undefined,
+      tags:
+        getMetaContent('gbsdk:tags')
+          ?.split(',')
+          .map(t => t.trim()) || undefined,
       version: getMetaContent('gbsdk:version') || getMetaContent('game-version') || undefined,
-      uploadedAt: getMetaContent('gbsdk:uploaded-at') || undefined
+      uploadedAt: getMetaContent('gbsdk:uploaded-at') || undefined,
     };
   }
 
@@ -564,11 +567,11 @@ export class GBSDK extends EventEmitter {
 
     // Try different URL patterns
     const patterns = [
-      /\/games?\/([^/?]+)/i,        // /games/my-game or /game/my-game
-      /\/g\/([^/?]+)/i,             // /g/my-game (Poki style)
-      /\/play\/([^/?]+)/i,          // /play/my-game
-      /\/([^/?]+)\.html?$/i,        // /my-game.html
-      /game[_-]([^/?]+)/i,          // game_my-game or game-my-game
+      /\/games?\/([^/?]+)/i, // /games/my-game or /game/my-game
+      /\/g\/([^/?]+)/i, // /g/my-game (Poki style)
+      /\/play\/([^/?]+)/i, // /play/my-game
+      /\/([^/?]+)\.html?$/i, // /my-game.html
+      /game[_-]([^/?]+)/i, // game_my-game or game-my-game
     ];
 
     let gameId = 'unknown-game';
@@ -594,7 +597,7 @@ export class GBSDK extends EventEmitter {
       gameTitle: document.title || gameId,
       domain: hostname,
       portalUrl: url,
-      detectionMethod: 'url'
+      detectionMethod: 'url',
     };
   }
 

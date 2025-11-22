@@ -4,7 +4,7 @@ var Q=Object.defineProperty;var k=(a,r)=>()=>(a&&(r=a(a=0)),r);var X=(a,r)=>{for
 `;/**
  * GBSDK - GameBuster Ads SDK
  * Production-ready, zero-dependency in-game ads SDK
- * 
+ *
  * @version 1.0.0
  * @author GameBuster
  * @license MIT
