@@ -43,9 +43,18 @@ yarn add @gamebuster/gbsdk
 const gbsdk = new GBSDK.GBSDK(); // UMD
 // or: import { GBSDK } from '@gamebuster/gbsdk'; const gbsdk = new GBSDK(); // ESM
 
-// 1. Initialize SDK
+// 1. Initialize SDK with GameBuster ad tags
 await gbsdk.init({
-  configUrl: 'https://cdn.gamebuster.gg/ads/config.json?game_id=your_game',
+  configUrl: 'https://cdn.game-buster.com/config.json',
+  config: {
+    // Local fallback tags
+    rewardedTags: [
+      'https://pubads.g.doubleclick.net/gampad/ads?iu=/22648522631/gb_rewarded_global&description_url=https%3A%2F%2Fgame-buster.com%2Fplay%2F%5Bgame_slug%5D&tfcd=0&npa=0&sz=640x480&ciu_szs=1x1&gdfp_req=1&unviewed_position_start=1&output=vast&env=vp&impl=s&correlator='
+    ],
+    interstitialTags: [
+      'https://pubads.g.doubleclick.net/gampad/ads?iu=/22648522631/gb_interstitial_global&description_url=https%3A%2F%2Fgame-buster.com%2Fplay%2F%5Bgame_slug%5D&tfcd=0&npa=0&sz=640x480&ciu_szs=1x1&gdfp_req=1&output=vast&env=vp&impl=s&correlator='
+    ]
+  },
   debug: true
 });
 
