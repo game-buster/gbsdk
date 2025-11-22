@@ -79,9 +79,15 @@ export class ImaVastAdapter implements Adapter {
 
     // Disable VPAID for better performance and security
     try {
-      window.google.ima.settings.setVpaidMode(window.google.ima.settings.VpaidMode.DISABLED);
+      if (
+        window.google?.ima?.settings &&
+        window.google?.ima?.settings?.VpaidMode &&
+        window.google?.ima?.settings?.VpaidMode?.DISABLED !== undefined
+      ) {
+        window.google.ima.settings.setVpaidMode(window.google.ima.settings.VpaidMode.DISABLED);
+      }
     } catch (error) {
-      console.warn('GBSDK: Could not disable VPAID:', error);
+      // Silently ignore VPAID disable errors
     }
   }
 
