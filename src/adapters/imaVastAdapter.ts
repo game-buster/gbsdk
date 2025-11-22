@@ -227,8 +227,8 @@ export class ImaVastAdapter implements Adapter {
     this.adsManager = event.getAdsManager(this.currentPlayCtx!.mount.video, adsRenderingSettings);
 
     // Set up ads manager event listeners
-    this.adsManager.addEventListener(window.google!.ima.AdEvent.Type.LOADED, () =>
-      this.onAdEvent('loaded')
+    this.adsManager.addEventListener(window.google!.ima.AdEvent.Type.LOADED, (event: any) =>
+      this.onAdLoaded(event)
     );
 
     this.adsManager.addEventListener(window.google!.ima.AdEvent.Type.STARTED, () =>
@@ -355,6 +355,65 @@ export class ImaVastAdapter implements Adapter {
   }
 
   /**
+   * Handle ad loaded event
+   */
+  private onAdLoaded(event: any): void {
+    if (!this.currentPlayCtx) return;
+
+    if (this.currentPlayCtx.debug) {
+      console.log('ImaVastAdapter: Ad event - loaded');
+    }
+
+    this.currentPlayCtx.onEvent('loaded');
+
+    // Clear timeout on loaded event (ad is ready to play)
+    if (this.playTimeout) {
+      clearTimeout(this.playTimeout);
+      this.playTimeout = null;
+      if (this.currentPlayCtx.debug) {
+        console.log('ImaVastAdapter: Timeout cleared - ad loaded successfully');
+      }
+    }
+
+    // Check if this is a linear video ad
+    try {
+      const ad = event.getAd();
+      const isLinear = ad && ad.isLinear && ad.isLinear();
+
+      if (this.currentPlayCtx.debug) {
+        console.log('ImaVastAdapter: Ad type check', {
+          isLinear,
+          adType: ad ? (isLinear ? 'linear video' : 'non-linear/companion') : 'unknown',
+        });
+      }
+
+      // If it's not a linear video ad (e.g., clickthrough banner, companion ad)
+      // treat it as complete immediately since it won't fire video events
+      if (!isLinear) {
+        if (this.currentPlayCtx.debug) {
+          console.warn(
+            'ImaVastAdapter: Non-linear ad detected, treating as complete (no video playback)'
+          );
+        }
+
+        // Give it a short delay to allow click tracking, then complete
+        setTimeout(() => {
+          if (this.currentPlayCtx) {
+            this.currentPlayCtx.onEvent('started');
+            this.currentPlayCtx.onEvent('complete');
+            this.resolvePlay('ok');
+          }
+        }, 2000);
+      }
+    } catch (error) {
+      if (this.currentPlayCtx.debug) {
+        console.warn('ImaVastAdapter: Could not determine ad type', error);
+      }
+      // Continue normally if we can't determine the type
+    }
+  }
+
+  /**
    * Handle ad events
    */
   private onAdEvent(eventType: GBEvent): void {
@@ -365,15 +424,6 @@ export class ImaVastAdapter implements Adapter {
     }
 
     this.currentPlayCtx.onEvent(eventType);
-
-    // Clear timeout on loaded event (ad is ready to play)
-    if (eventType === 'loaded' && this.playTimeout) {
-      clearTimeout(this.playTimeout);
-      this.playTimeout = null;
-      if (this.currentPlayCtx.debug) {
-        console.log('ImaVastAdapter: Timeout cleared - ad loaded successfully');
-      }
-    }
 
     // Handle completion logic
     if (eventType === 'complete') {
