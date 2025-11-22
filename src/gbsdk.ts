@@ -242,8 +242,8 @@ export class GBSDK extends EventEmitter {
       }
     }
 
-    // Show overlay and hide close button during ad
-    showOverlay(this.state.overlay!.overlay);
+    // Don't show overlay yet - wait for ad to load
+    // Overlay will be shown in onAdLoaded event
     if (this.state.overlay?.closeBtn) {
       this.state.overlay.closeBtn.style.display = 'none';
     }

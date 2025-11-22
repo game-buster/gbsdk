@@ -5,7 +5,7 @@
 
 import type { Adapter, PlayCtx, GBEvent } from '../types.js';
 import { loadScriptOnce, appendQuery } from '../utils/net.js';
-import { calculate16x9Dimensions, getOverlayDimensions } from '../utils/dom.js';
+import { calculate16x9Dimensions, getOverlayDimensions, showOverlay } from '../utils/dom.js';
 
 // Google IMA SDK types (minimal declarations)
 declare global {
@@ -363,6 +363,9 @@ export class ImaVastAdapter implements Adapter {
     if (this.currentPlayCtx.debug) {
       console.log('ImaVastAdapter: Ad event - loaded');
     }
+
+    // Show overlay now that ad is loaded
+    showOverlay(this.currentPlayCtx.mount.overlay);
 
     this.currentPlayCtx.onEvent('loaded');
 
