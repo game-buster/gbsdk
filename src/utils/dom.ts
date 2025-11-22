@@ -73,6 +73,8 @@ function createOverlay(): HTMLElement {
  * Show the overlay
  */
 export function showOverlay(overlay: HTMLElement): void {
+  console.log('🎬 showOverlay() called - displaying ad overlay');
+
   // Store currently focused element
   previouslyFocusedElement = document.activeElement as HTMLElement;
 
@@ -93,6 +95,8 @@ export function showOverlay(overlay: HTMLElement): void {
  * Hide the overlay
  */
 export function hideOverlay(overlay: HTMLElement): void {
+  console.log('🚫 hideOverlay() called - hiding ad overlay');
+
   // Hide overlay
   overlay.style.display = 'none';
 

@@ -20,6 +20,11 @@ export type GBInit = {
   sessionCap?: number; // default 20
   debug?: boolean; // default false
   storageKey?: string; // default 'gbsdk'
+
+  // Revenue tracking (optional):
+  gameId?: string; // Unique game identifier
+  developerId?: string; // Developer identifier
+  trackingUrl?: string; // Backend endpoint for revenue tracking
 };
 
 // Show ad result types

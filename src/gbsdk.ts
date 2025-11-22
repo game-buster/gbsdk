@@ -23,6 +23,12 @@ import { getTCF } from './utils/tcf.js';
 import { ensureOverlay, showOverlay, hideOverlay, cleanupVideo } from './utils/dom.js';
 import { sessionStorage, getStoredJSON, setStoredJSON } from './utils/storage.js';
 import { SDK_VERSION } from './utils/version.js';
+import {
+  trackAdImpression,
+  generateSessionId,
+  getAdNetworkFromTag,
+  type AdImpressionData,
+} from './utils/tracking.js';
 
 export class GBSDK extends EventEmitter {
   private state: SDKState = {
@@ -37,6 +43,7 @@ export class GBSDK extends EventEmitter {
   private remoteConfig: RemoteConfig | null = null;
   private waterfallManager: WaterfallManager | null = null;
   private userGestureRequired = true;
+  private sessionId: string = generateSessionId();
 
   /**
    * Initialize the SDK with automatic game detection
@@ -331,6 +338,11 @@ export class GBSDK extends EventEmitter {
       mount: this.state.overlay,
       onEvent: (event: GBEvent, data?: any) => {
         this.emit(event, { kind, ...data });
+
+        // Track ad impression on complete
+        if (event === 'complete') {
+          this.trackImpression(tagUrl, kind);
+        }
       },
       debug: this.state.config.debug || false,
     };
@@ -658,6 +670,36 @@ export class GBSDK extends EventEmitter {
       window.location.hostname.includes('staging') ||
       window.location.search.includes('debug=true')
     );
+  }
+
+  /**
+   * Track ad impression for revenue sharing
+   */
+  private trackImpression(tagUrl: string, kind: AdKind): void {
+    const { gameId, developerId, trackingUrl } = this.state.config;
+
+    // Only track if tracking is configured
+    if (!trackingUrl || !gameId || !developerId) {
+      return;
+    }
+
+    const impressionData: AdImpressionData = {
+      gameId,
+      developerId,
+      adType: kind,
+      adNetwork: getAdNetworkFromTag(tagUrl),
+      timestamp: Date.now(),
+      sessionId: this.sessionId,
+      userAgent: navigator.userAgent,
+      referrer: document.referrer,
+    };
+
+    // Send tracking data (non-blocking)
+    trackAdImpression(trackingUrl, impressionData);
+
+    if (this.state.config.debug) {
+      console.log('📊 Ad impression tracked:', impressionData);
+    }
   }
 
   /**
