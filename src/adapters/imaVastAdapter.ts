@@ -107,10 +107,10 @@ export class ImaVastAdapter implements Adapter {
         console.log('ImaVastAdapter: Starting ad request', { tagUrl });
       }
 
-      // Set up timeout (increased to 15 seconds)
+      // Set up timeout (30 seconds for slow ad networks)
       this.playTimeout = window.setTimeout(() => {
         this.handleTimeout();
-      }, 15000);
+      }, 30000);
 
       try {
         this.initializeAd(tagUrl, ctx);
@@ -360,7 +360,20 @@ export class ImaVastAdapter implements Adapter {
   private onAdEvent(eventType: GBEvent): void {
     if (!this.currentPlayCtx) return;
 
+    if (this.currentPlayCtx.debug) {
+      console.log(`ImaVastAdapter: Ad event - ${eventType}`);
+    }
+
     this.currentPlayCtx.onEvent(eventType);
+
+    // Clear timeout on loaded event (ad is ready to play)
+    if (eventType === 'loaded' && this.playTimeout) {
+      clearTimeout(this.playTimeout);
+      this.playTimeout = null;
+      if (this.currentPlayCtx.debug) {
+        console.log('ImaVastAdapter: Timeout cleared - ad loaded successfully');
+      }
+    }
 
     // Handle completion logic
     if (eventType === 'complete') {
@@ -427,6 +440,9 @@ export class ImaVastAdapter implements Adapter {
    * Handle timeout
    */
   private handleTimeout(): void {
+    if (this.currentPlayCtx?.debug) {
+      console.warn('ImaVastAdapter: Ad request timeout after 30 seconds');
+    }
     if (this.currentPlayCtx) {
       this.currentPlayCtx.onEvent('timeout');
     }
