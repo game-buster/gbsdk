@@ -62,68 +62,79 @@ app.post('/track/impression', express.json(), async (req, res) => {
     sessionId
   } = req.body;
 
-  // Save to database
+  // Save to database (just track impressions, no revenue estimation)
   await db.impressions.insert({
     gameId,
     developerId,
     adType,
     adNetwork,
     timestamp,
-    sessionId,
-    // Add estimated revenue based on ad network
-    estimatedRevenue: getEstimatedRevenue(adNetwork, adType),
-    currency: 'USD'
+    sessionId
   });
 
   res.status(200).json({ success: true });
 });
-
-function getEstimatedRevenue(adNetwork, adType) {
-  // Example CPM rates (adjust based on your actual rates)
-  const rates = {
-    'GameBuster': { rewarded: 0.015, interstitial: 0.010 },
-    'FilthySelection': { rewarded: 0.012, interstitial: 0.008 },
-    'AdButler': { rewarded: 0.010, interstitial: 0.007 },
-    'YourAdExchange': { rewarded: 0.008, interstitial: 0.005 }
-  };
-  
-  return rates[adNetwork]?.[adType] || 0.005;
-}
 ```
 
 ## Revenue Calculation
 
-### Example SQL Query (Monthly Revenue per Developer)
+**Important**: Revenue is calculated from actual ad network payouts, not estimated per impression.
+
+### Process:
+
+1. **Track Impressions**: SDK tracks all ad impressions per game/developer
+2. **Get Ad Network Reports**: Monthly reports from ad networks (Google Ad Manager, etc.)
+3. **Calculate Total Revenue**: Sum of all ad network payouts for the month
+4. **Distribute by Impression Share**: Revenue distributed proportionally based on impressions
+
+### Example SQL Query (Monthly Impressions per Developer)
 
 ```sql
-SELECT 
+SELECT
   developerId,
   gameId,
   COUNT(*) as totalImpressions,
-  SUM(estimatedRevenue) as totalRevenue,
-  SUM(estimatedRevenue) * 0.70 as developerShare,  -- 70% to developer
-  SUM(estimatedRevenue) * 0.30 as platformShare    -- 30% to platform
+  COUNT(*) * 100.0 / SUM(COUNT(*)) OVER () as impressionSharePercent
 FROM impressions
 WHERE timestamp >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
 GROUP BY developerId, gameId
-ORDER BY totalRevenue DESC;
+ORDER BY totalImpressions DESC;
 ```
 
-## Revenue Share Models
+### Revenue Distribution Formula
 
-### Option 1: Fixed Percentage (Recommended)
-- **Developer**: 70% of ad revenue
-- **Platform**: 30% of ad revenue
+```javascript
+// Example calculation for November 2024
 
-### Option 2: Tiered System
-- **0-1000 impressions**: 60% to developer
-- **1000-10000 impressions**: 70% to developer
-- **10000+ impressions**: 80% to developer
+// Step 1: Get total impressions
+const totalImpressions = 500000; // All games combined
 
-### Option 3: Performance-Based
-- Base: 70% to developer
-- Bonus: +5% if retention > 50%
-- Bonus: +5% if session time > 5 minutes
+// Step 2: Get actual revenue from ad networks
+const adNetworkRevenue = {
+  'GameBuster': 3200.00,      // From Google Ad Manager report
+  'FilthySelection': 2100.00, // From FilthySelection dashboard
+  'AdButler': 800.00,         // From AdButler report
+  'YourAdExchange': 400.00    // From YourAdExchange report
+};
+const totalRevenue = 6500.00; // Sum of all networks
+
+// Step 3: Calculate pools
+const platformShare = totalRevenue * 0.40; // $2,600
+const developerPool = totalRevenue * 0.60; // $3,900
+
+// Step 4: Calculate per developer
+const developerImpressions = 50000; // Developer's game impressions
+const developerShare = (developerImpressions / totalImpressions) * developerPool;
+// = (50000 / 500000) × $3,900 = $390.00
+```
+
+## Revenue Share Model
+
+### Fixed 60/40 Split
+- **Developer**: 60% of total ad revenue
+- **Platform**: 40% of total ad revenue
+
+Revenue is distributed proportionally based on each developer's share of total impressions.
 
 ## Dashboard Example
 
@@ -135,21 +146,17 @@ Create a developer dashboard showing:
   "developerId": "dev_12345",
   "currentMonth": {
     "impressions": 15420,
-    "revenue": 185.04,
-    "developerShare": 129.53,
-    "games": [
-      {
-        "gameId": "my-awesome-game",
-        "impressions": 12300,
-        "revenue": 147.60,
-        "developerShare": 103.32
-      }
-    ]
+    "impressionShare": 12.5,  // % of total platform impressions
+    "estimatedRevenue": "TBD", // Calculated after month ends based on actual ad network payouts
+    "status": "pending"
   },
   "lastMonth": {
     "impressions": 12100,
-    "revenue": 145.20,
-    "developerShare": 101.64
+    "impressionShare": 10.8,
+    "totalPlatformRevenue": 8500.00,  // Total from ad networks
+    "developerPool": 5100.00,         // 60% of total
+    "developerShare": 550.80,         // 10.8% of developer pool
+    "status": "paid"
   }
 }
 ```
