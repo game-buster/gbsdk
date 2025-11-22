@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GBSDK Simple Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #0056CC;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .log {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+            white-space: pre-wrap;
+        }
+        .status {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .error {
+            color: #ff4444;
+        }
+        .success {
+            color: #00ff00;
+        }
+        .warn {
+            color: #ffa500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 GBSDK Simple Test</h1>
+        
+        <div class="status">
+            <div>SDK Status: <span id="status">Not Initialized</span></div>
+            <div>GBSDK Loaded: <span id="sdkLoaded">Checking...</span></div>
+        </div>
+
+        <div>
+            <button id="initBtn">1. Initialize SDK</button>
+            <button id="interstitialBtn" disabled>2. Show Interstitial</button>
+            <button id="rewardedBtn" disabled>3. Show Rewarded</button>
+        </div>
+
+        <button onclick="clearLog()" style="background: #666; margin-top: 20px;">Clear Log</button>
+        <div class="log" id="log"></div>
+    </div>
+
+    <!-- Load GBSDK -->
+    <script src="../dist/index.js"></script>
+
+    <script>
+        const logEl = document.getElementById('log');
+        const statusEl = document.getElementById('status');
+        const sdkLoadedEl = document.getElementById('sdkLoaded');
+        const initBtn = document.getElementById('initBtn');
+        const interstitialBtn = document.getElementById('interstitialBtn');
+        const rewardedBtn = document.getElementById('rewardedBtn');
+
+        let gbsdk = null;
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const colors = {
+                'info': '',
+                'success': 'success',
+                'error': 'error',
+                'warn': 'warn'
+            };
+            const span = document.createElement('span');
+            span.className = colors[type];
+            span.textContent = `[${timestamp}] ${message}\n`;
+            logEl.appendChild(span);
+            logEl.scrollTop = logEl.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function clearLog() {
+            logEl.innerHTML = '';
+        }
+
+        // Check if GBSDK is loaded
+        if (typeof GBSDK !== 'undefined') {
+            sdkLoadedEl.textContent = '✅ Yes';
+            sdkLoadedEl.className = 'success';
+            log('GBSDK script loaded successfully', 'success');
+            log('GBSDK object:', 'info');
+            log(JSON.stringify(Object.keys(GBSDK), null, 2), 'info');
+        } else {
+            sdkLoadedEl.textContent = '❌ No';
+            sdkLoadedEl.className = 'error';
+            log('ERROR: GBSDK not found!', 'error');
+            log('Check if ../dist/index.js exists', 'error');
+        }
+
+        // Initialize SDK
+        async function initializeSDK() {
+            try {
+                log('Creating GBSDK instance...', 'info');
+                
+                if (typeof GBSDK === 'undefined') {
+                    throw new Error('GBSDK is not loaded');
+                }
+
+                gbsdk = new GBSDK.GBSDK();
+                log('GBSDK instance created', 'success');
+
+                // Add event listeners
+                gbsdk.on('loaded', () => log('📺 Ad loaded', 'success'));
+                gbsdk.on('started', () => log('▶️ Ad started', 'success'));
+                gbsdk.on('complete', () => log('✅ Ad completed', 'success'));
+                gbsdk.on('error', (data) => log(`❌ Ad error: ${data?.error || 'Unknown'}`, 'error'));
+                gbsdk.on('no_fill', () => log('⚠️ No ad fill', 'warn'));
+
+                log('Initializing SDK with config...', 'info');
+                
+                await gbsdk.init({
+                    configUrl: './config.sample.json',
+                    allowDomains: [],
+                    debug: true
+                });
+
+                log('✨ SDK initialized successfully!', 'success');
+                statusEl.textContent = '✅ Initialized';
+                statusEl.className = 'success';
+                
+                initBtn.disabled = true;
+                interstitialBtn.disabled = false;
+                rewardedBtn.disabled = false;
+
+            } catch (error) {
+                log(`❌ Initialization failed: ${error.message}`, 'error');
+                log(`Stack: ${error.stack}`, 'error');
+                statusEl.textContent = '❌ Failed';
+                statusEl.className = 'error';
+            }
+        }
+
+        // Show interstitial
+        async function showInterstitial() {
+            try {
+                log('Requesting interstitial ad...', 'info');
+                interstitialBtn.disabled = true;
+                interstitialBtn.textContent = 'Loading...';
+
+                const result = await gbsdk.showInterstitial();
+
+                if (result.success) {
+                    log('🎉 Interstitial completed!', 'success');
+                } else {
+                    log(`⚠️ Interstitial failed: ${result.reason}`, 'warn');
+                }
+
+            } catch (error) {
+                log(`❌ Interstitial error: ${error.message}`, 'error');
+            } finally {
+                interstitialBtn.textContent = '2. Show Interstitial';
+                setTimeout(() => {
+                    if (gbsdk && gbsdk.canShow('interstitial')) {
+                        interstitialBtn.disabled = false;
+                    }
+                }, 1000);
+            }
+        }
+
+        // Show rewarded
+        async function showRewarded() {
+            try {
+                log('Requesting rewarded ad...', 'info');
+                rewardedBtn.disabled = true;
+                rewardedBtn.textContent = 'Loading...';
+
+                const result = await gbsdk.showRewarded();
+
+                if (result.success) {
+                    log('💰 Rewarded completed - GRANT REWARD!', 'success');
+                } else {
+                    log(`⚠️ Rewarded failed: ${result.reason} - NO REWARD`, 'warn');
+                }
+
+            } catch (error) {
+                log(`❌ Rewarded error: ${error.message}`, 'error');
+            } finally {
+                rewardedBtn.textContent = '3. Show Rewarded';
+                setTimeout(() => {
+                    if (gbsdk && gbsdk.canShow('rewarded')) {
+                        rewardedBtn.disabled = false;
+                    }
+                }, 1000);
+            }
+        }
+
+        // Event listeners
+        initBtn.addEventListener('click', initializeSDK);
+        interstitialBtn.addEventListener('click', showInterstitial);
+        rewardedBtn.addEventListener('click', showRewarded);
+
+        // Initial log
+        log('Test page loaded. Click "Initialize SDK" to begin.', 'info');
+        log('Current URL: ' + window.location.href, 'info');
+    </script>
+</body>
+</html>
+

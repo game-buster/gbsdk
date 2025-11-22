@@ -1,0 +1,26 @@
+{
+  "version": "1.0.0",
+  "sdkMin": "1.0.0",
+  "cooldownSec": 90,
+  "sessionCap": 20,
+  "interstitial": {
+    "tags": [
+      "https://filthyselection.com/dHm/Fdz.dfG/NwvvZMGiUF/leDmq9uuaZ/UBlykAPlTTYG3HMKTWAXynOVT/MptTNOjjc/x/M/D/IT5jNSCWZis/axWh1gpEdYDH0Bxh",
+      "https://servedbyadbutler.com/vast.spark?setID=66361&ID=189225",
+      "https://youradexchange.com/video/select.php?r=10633338"
+    ],
+    "blockedCountries": []
+  },
+  "rewarded": {
+    "tags": [
+      "https://filthyselection.com/dHm/Fdz.dfG/NwvvZMGiUF/leDmq9uuaZ/UBlykAPlTTYG3HMKTWAXynOVT/MptTNOjjc/x/M/D/IT5jNSCWZis/axWh1gpEdYDH0Bxh",
+      "https://servedbyadbutler.com/vast.spark?setID=66361&ID=189225",
+      "https://youradexchange.com/video/select.php?r=10633338"
+    ],
+    "blockedCountries": []
+  },
+  "featureFlags": {
+    "killInterstitial": false,
+    "killRewarded": false
+  }
+}

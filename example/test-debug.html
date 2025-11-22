@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GBSDK Debug Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #00ff00;
+        }
+        .section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #00ff00;
+        }
+        h2 {
+            color: #00ffff;
+            margin-top: 0;
+        }
+        button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #00cc00;
+        }
+        button:disabled {
+            background: #666;
+            color: #999;
+            cursor: not-allowed;
+        }
+        .log {
+            background: #000;
+            padding: 15px;
+            border-radius: 5px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            font-size: 12px;
+        }
+        .success { color: #00ff00; }
+        .error { color: #ff0000; }
+        .warn { color: #ffaa00; }
+        .info { color: #00aaff; }
+        .status-item {
+            padding: 5px 0;
+            border-bottom: 1px solid #333;
+        }
+        .status-label {
+            color: #888;
+            display: inline-block;
+            width: 200px;
+        }
+        .status-value {
+            color: #fff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 GBSDK Debug Test</h1>
+
+    <div class="section">
+        <h2>1. Environment Check</h2>
+        <div id="envCheck"></div>
+    </div>
+
+    <div class="section">
+        <h2>2. VAST Tag Direct Test</h2>
+        <p>Test VAST tags directly with Google IMA</p>
+        <button onclick="testVastTag()">Test Google DoubleClick VAST</button>
+        <button onclick="testApplixiVast()">Test Applixi VAST</button>
+        <div id="vastTest" class="log"></div>
+    </div>
+
+    <div class="section">
+        <h2>3. GBSDK Test</h2>
+        <button id="initBtn" onclick="initSDK()">Initialize GBSDK</button>
+        <button id="showAdBtn" onclick="showAd()" disabled>Show Interstitial</button>
+        <div id="sdkTest" class="log"></div>
+    </div>
+
+    <!-- Load Google IMA SDK -->
+    <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
+    
+    <!-- Load GBSDK -->
+    <script src="../dist/index.js"></script>
+
+    <script>
+        let gbsdk = null;
+        let adsLoader = null;
+        let adsManager = null;
+
+        // Environment Check
+        function checkEnvironment() {
+            const envCheck = document.getElementById('envCheck');
+            let html = '';
+
+            // Check Google IMA
+            html += `<div class="status-item">
+                <span class="status-label">Google IMA SDK:</span>
+                <span class="status-value ${typeof google !== 'undefined' && google.ima ? 'success' : 'error'}">
+                    ${typeof google !== 'undefined' && google.ima ? '✅ Loaded' : '❌ Not Loaded'}
+                </span>
+            </div>`;
+
+            // Check GBSDK
+            html += `<div class="status-item">
+                <span class="status-label">GBSDK:</span>
+                <span class="status-value ${typeof GBSDK !== 'undefined' ? 'success' : 'error'}">
+                    ${typeof GBSDK !== 'undefined' ? '✅ Loaded' : '❌ Not Loaded'}
+                </span>
+            </div>`;
+
+            // Check URL
+            html += `<div class="status-item">
+                <span class="status-label">Current URL:</span>
+                <span class="status-value">${window.location.href}</span>
+            </div>`;
+
+            // Check Protocol
+            html += `<div class="status-item">
+                <span class="status-label">Protocol:</span>
+                <span class="status-value ${window.location.protocol === 'https:' ? 'success' : 'warn'}">
+                    ${window.location.protocol} ${window.location.protocol === 'http:' ? '(Some ads may not work)' : ''}
+                </span>
+            </div>`;
+
+            envCheck.innerHTML = html;
+        }
+
+        // Test VAST tag directly
+        function testVastTag() {
+            const logEl = document.getElementById('vastTest');
+            logEl.innerHTML = '';
+            
+            function log(msg, type = 'info') {
+                const span = document.createElement('div');
+                span.className = type;
+                span.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+                logEl.appendChild(span);
+                console.log(msg);
+            }
+
+            log('Testing Google DoubleClick VAST tag...', 'info');
+
+            if (typeof google === 'undefined' || !google.ima) {
+                log('ERROR: Google IMA SDK not loaded!', 'error');
+                return;
+            }
+
+            try {
+                // Create video element
+                const video = document.createElement('video');
+                video.style.display = 'none';
+                document.body.appendChild(video);
+
+                // Create ad container
+                const adContainer = document.createElement('div');
+                adContainer.style.position = 'fixed';
+                adContainer.style.top = '50%';
+                adContainer.style.left = '50%';
+                adContainer.style.transform = 'translate(-50%, -50%)';
+                adContainer.style.width = '640px';
+                adContainer.style.height = '480px';
+                adContainer.style.background = '#000';
+                adContainer.style.zIndex = '10000';
+                document.body.appendChild(adContainer);
+
+                const adDisplayContainer = new google.ima.AdDisplayContainer(adContainer, video);
+                adDisplayContainer.initialize();
+
+                adsLoader = new google.ima.AdsLoader(adDisplayContainer);
+
+                adsLoader.addEventListener(
+                    google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
+                    (event) => {
+                        log('✅ Ad loaded successfully!', 'success');
+                        
+                        adsManager = event.getAdsManager(video);
+                        
+                        adsManager.addEventListener(google.ima.AdEvent.Type.STARTED, () => {
+                            log('▶️ Ad started playing', 'success');
+                        });
+                        
+                        adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE, () => {
+                            log('✅ Ad completed', 'success');
+                            cleanup();
+                        });
+                        
+                        adsManager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, (e) => {
+                            log(`❌ Ad error: ${e.getError().getMessage()}`, 'error');
+                            cleanup();
+                        });
+
+                        try {
+                            adsManager.init(640, 480, google.ima.ViewMode.NORMAL);
+                            adsManager.start();
+                        } catch (e) {
+                            log(`❌ Error starting ad: ${e.message}`, 'error');
+                            cleanup();
+                        }
+                    }
+                );
+
+                adsLoader.addEventListener(
+                    google.ima.AdErrorEvent.Type.AD_ERROR,
+                    (event) => {
+                        const error = event.getError();
+                        log(`❌ Ad request error: ${error.getMessage()}`, 'error');
+                        log(`Error code: ${error.getErrorCode()}`, 'error');
+                        log(`Error type: ${error.getType()}`, 'error');
+                        cleanup();
+                    }
+                );
+
+                const adsRequest = new google.ima.AdsRequest();
+                adsRequest.adTagUrl = 'https://pubads.g.doubleclick.net/gampad/ads?iu=/21775744923/external/single_preroll_skippable&sz=640x480&ciu_szs=300x250%2C728x90&gdfp_req=1&output=vast&unviewed_position_start=1&env=vp&impl=s&correlator=' + Date.now();
+                adsRequest.linearAdSlotWidth = 640;
+                adsRequest.linearAdSlotHeight = 480;
+
+                log('Requesting ad from Google DoubleClick...', 'info');
+                log('Tag URL: ' + adsRequest.adTagUrl, 'info');
+                
+                adsLoader.requestAds(adsRequest);
+
+                function cleanup() {
+                    if (adsManager) {
+                        adsManager.destroy();
+                        adsManager = null;
+                    }
+                    if (adContainer && adContainer.parentNode) {
+                        adContainer.parentNode.removeChild(adContainer);
+                    }
+                    if (video && video.parentNode) {
+                        video.parentNode.removeChild(video);
+                    }
+                }
+
+            } catch (error) {
+                log(`❌ Exception: ${error.message}`, 'error');
+                log(`Stack: ${error.stack}`, 'error');
+            }
+        }
+
+        // Test Applixi VAST
+        function testApplixiVast() {
+            const logEl = document.getElementById('vastTest');
+            logEl.innerHTML = '';
+            
+            function log(msg, type = 'info') {
+                const span = document.createElement('div');
+                span.className = type;
+                span.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+                logEl.appendChild(span);
+                console.log(msg);
+            }
+
+            log('Testing Applixi VAST tag...', 'warn');
+            log('Note: Applixi may not serve ads from localhost', 'warn');
+            
+            // Same test but with Applixi URL
+            const applixiUrl = 'https://api.applixi.com/v1/vast?apiKey=7c86d490-107f-48c4-ab66-0419cd2d1e34&type=interstitial&test=1&correlator=' + Date.now();
+            log('Tag URL: ' + applixiUrl, 'info');
+            
+            // You can implement similar test here
+            log('Applixi test not fully implemented - use GBSDK test instead', 'info');
+        }
+
+        // Initialize GBSDK
+        async function initSDK() {
+            const logEl = document.getElementById('sdkTest');
+            logEl.innerHTML = '';
+            
+            function log(msg, type = 'info') {
+                const span = document.createElement('div');
+                span.className = type;
+                span.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+                logEl.appendChild(span);
+                console.log(msg);
+            }
+
+            try {
+                log('Creating GBSDK instance...', 'info');
+                gbsdk = new GBSDK.GBSDK();
+
+                gbsdk.on('loaded', () => log('📺 Ad loaded', 'success'));
+                gbsdk.on('started', () => log('▶️ Ad started', 'success'));
+                gbsdk.on('complete', () => log('✅ Ad completed', 'success'));
+                gbsdk.on('error', (data) => log(`❌ Error: ${JSON.stringify(data)}`, 'error'));
+                gbsdk.on('no_fill', () => log('⚠️ No fill', 'warn'));
+                gbsdk.on('timeout', () => log('⏱️ Timeout', 'warn'));
+
+                log('Initializing with config...', 'info');
+                await gbsdk.init({
+                    configUrl: './config.sample.json',
+                    allowDomains: [],
+                    debug: true
+                });
+
+                log('✅ SDK initialized!', 'success');
+                document.getElementById('initBtn').disabled = true;
+                document.getElementById('showAdBtn').disabled = false;
+
+            } catch (error) {
+                log(`❌ Init error: ${error.message}`, 'error');
+                log(`Stack: ${error.stack}`, 'error');
+            }
+        }
+
+        // Show ad
+        async function showAd() {
+            const logEl = document.getElementById('sdkTest');
+            
+            function log(msg, type = 'info') {
+                const span = document.createElement('div');
+                span.className = type;
+                span.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+                logEl.appendChild(span);
+                console.log(msg);
+            }
+
+            try {
+                log('Requesting interstitial ad...', 'info');
+                log('Can show: ' + gbsdk.canShow('interstitial'), 'info');
+                
+                const result = await gbsdk.showInterstitial();
+                
+                log('Result: ' + JSON.stringify(result), result.success ? 'success' : 'error');
+
+            } catch (error) {
+                log(`❌ Show ad error: ${error.message}`, 'error');
+            }
+        }
+
+        // Run environment check on load
+        window.addEventListener('load', () => {
+            setTimeout(checkEnvironment, 100);
+        });
+    </script>
+</body>
+</html>
+

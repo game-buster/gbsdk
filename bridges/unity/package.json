@@ -1,0 +1,36 @@
+{
+  "name": "com.gamebuster.gbsdk",
+  "version": "1.0.0",
+  "displayName": "GBSDK - GameBuster Ads SDK",
+  "description": "Unity WebGL bridge for GBSDK - A lightweight, zero-dependency in-game ads SDK with VAST 4.x + Google IMA HTML5 support. Provides 5 simple methods for easy integration: init, showInterstitial, showRewarded, gameStarted, gameEnded.",
+  "unity": "2020.3",
+  "unityRelease": "0f1",
+  "keywords": [
+    "ads",
+    "advertising",
+    "video ads",
+    "interstitial",
+    "rewarded",
+    "webgl",
+    "vast",
+    "ima",
+    "gamebuster"
+  ],
+  "author": {
+    "name": "GameBuster",
+    "email": "support@gamebuster.gg",
+    "url": "https://gamebuster.gg"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gamebuster/gbsdk.git"
+  },
+  "license": "MIT",
+  "samples": [
+    {
+      "displayName": "Basic Integration Example",
+      "description": "Complete example showing how to integrate GBSDK into your Unity WebGL game",
+      "path": "Samples~/BasicIntegration"
+    }
+  ]
+}

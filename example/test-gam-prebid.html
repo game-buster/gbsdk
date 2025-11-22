@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GBSDK - GAM + Prebid Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .status {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .button-group {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .log {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-left: 3px solid #667eea;
+            padding-left: 10px;
+        }
+
+        .log-entry.error {
+            border-left-color: #f44336;
+            color: #ff6b6b;
+        }
+
+        .log-entry.success {
+            border-left-color: #4caf50;
+            color: #69f0ae;
+        }
+
+        .log-entry.info {
+            border-left-color: #2196f3;
+            color: #64b5f6;
+        }
+
+        .waterfall-info {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .waterfall-info h3 {
+            margin-bottom: 10px;
+            color: #856404;
+        }
+
+        .waterfall-info ol {
+            margin-left: 20px;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 GBSDK Test</h1>
+        <p class="subtitle">Google Ad Manager + Prebid.js Waterfall</p>
+
+        <div class="waterfall-info">
+            <h3>📊 Waterfall Sırası:</h3>
+            <ol>
+                <li><strong>Prebid</strong> - Header bidding (AppNexus, Rubicon, IX)</li>
+                <li><strong>GAM</strong> - Google Ad Manager</li>
+                <li><strong>VAST</strong> - Applixi fallback</li>
+            </ol>
+        </div>
+
+        <div id="status" class="status">
+            Initializing GBSDK...
+        </div>
+
+        <div class="button-group">
+            <button id="interstitialBtn" disabled>
+                🎬 Show Interstitial Ad
+            </button>
+            <button id="rewardedBtn" disabled>
+                💰 Show Rewarded Ad
+            </button>
+            <button id="clearLogBtn">
+                🗑️ Clear Log
+            </button>
+        </div>
+
+        <div id="log" class="log"></div>
+    </div>
+
+    <!-- Load GBSDK -->
+    <script src="../dist/index.js"></script>
+
+    <script>
+        const statusEl = document.getElementById('status');
+        const logEl = document.getElementById('log');
+        const interstitialBtn = document.getElementById('interstitialBtn');
+        const rewardedBtn = document.getElementById('rewardedBtn');
+        const clearLogBtn = document.getElementById('clearLogBtn');
+
+        let gbsdk;
+
+        // Logging functions
+        function log(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logEl.appendChild(entry);
+            logEl.scrollTop = logEl.scrollHeight;
+            console.log(message);
+        }
+
+        function setStatus(message, type = 'info') {
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+        }
+
+        // Initialize GBSDK
+        async function init() {
+            try {
+                log('🚀 Initializing GBSDK with GAM + Prebid...', 'info');
+                
+                gbsdk = new GBSDK.GBSDK();
+
+                // Listen to events
+                gbsdk.on('loaded', (data) => {
+                    log(`✅ Ad loaded: ${data.kind}`, 'success');
+                });
+
+                gbsdk.on('started', (data) => {
+                    log(`▶️ Ad started: ${data.kind}`, 'info');
+                });
+
+                gbsdk.on('completed', (data) => {
+                    log(`✅ Ad completed: ${data.kind}`, 'success');
+                });
+
+                gbsdk.on('no_fill', (data) => {
+                    log(`⚠️ No fill: ${data.kind}`, 'error');
+                });
+
+                gbsdk.on('error', (data) => {
+                    log(`❌ Error: ${data.kind}`, 'error');
+                });
+
+                await gbsdk.init({
+                    configUrl: './config.gam-prebid.json',
+                    debug: true
+                });
+
+                log('✅ GBSDK initialized successfully!', 'success');
+                setStatus('✅ Ready! Click buttons to show ads.', 'success');
+
+                // Enable buttons
+                interstitialBtn.disabled = false;
+                rewardedBtn.disabled = false;
+
+                // Track game session
+                gbsdk.gameStarted();
+                log('🎮 Game session started', 'info');
+
+            } catch (error) {
+                log(`❌ Initialization error: ${error.message}`, 'error');
+                setStatus('❌ Failed to initialize GBSDK', 'error');
+            }
+        }
+
+        // Show interstitial ad
+        interstitialBtn.addEventListener('click', async () => {
+            try {
+                log('🎬 Requesting interstitial ad...', 'info');
+                setStatus('Loading interstitial ad...', 'info');
+                
+                interstitialBtn.disabled = true;
+                
+                const result = await gbsdk.showInterstitial();
+                
+                if (result.success) {
+                    log('✅ Interstitial ad completed successfully!', 'success');
+                    setStatus('✅ Interstitial ad completed!', 'success');
+                } else {
+                    log(`⚠️ Interstitial ad failed: ${result.reason}`, 'error');
+                    setStatus(`⚠️ Failed: ${result.reason}`, 'error');
+                }
+                
+                interstitialBtn.disabled = false;
+            } catch (error) {
+                log(`❌ Error showing interstitial: ${error.message}`, 'error');
+                setStatus('❌ Error showing ad', 'error');
+                interstitialBtn.disabled = false;
+            }
+        });
+
+        // Show rewarded ad
+        rewardedBtn.addEventListener('click', async () => {
+            try {
+                log('💰 Requesting rewarded ad...', 'info');
+                setStatus('Loading rewarded ad...', 'info');
+                
+                rewardedBtn.disabled = true;
+                
+                const result = await gbsdk.showRewarded();
+                
+                if (result.success) {
+                    log('✅ Rewarded ad completed! User earned reward!', 'success');
+                    setStatus('✅ Reward granted! 🎉', 'success');
+                    
+                    // Grant reward to player
+                    log('💎 Granting 100 coins to player...', 'success');
+                } else {
+                    log(`⚠️ Rewarded ad failed: ${result.reason}`, 'error');
+                    setStatus(`⚠️ Failed: ${result.reason}`, 'error');
+                }
+                
+                rewardedBtn.disabled = false;
+            } catch (error) {
+                log(`❌ Error showing rewarded ad: ${error.message}`, 'error');
+                setStatus('❌ Error showing ad', 'error');
+                rewardedBtn.disabled = false;
+            }
+        });
+
+        // Clear log
+        clearLogBtn.addEventListener('click', () => {
+            logEl.innerHTML = '';
+            log('🗑️ Log cleared', 'info');
+        });
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>
+

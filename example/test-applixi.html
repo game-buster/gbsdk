@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GBSDK + Applixi Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .api-key {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: monospace;
+            font-size: 14px;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .rewarded {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .rewarded:hover {
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
+        }
+
+        .game-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .game-btn:hover {
+            box-shadow: 0 6px 20px rgba(79, 172, 254, 0.6);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .status-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .status-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .status-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .status-value {
+            color: #333;
+            font-weight: 700;
+            font-family: monospace;
+        }
+
+        .status-value.success {
+            color: #28a745;
+        }
+
+        .status-value.error {
+            color: #dc3545;
+        }
+
+        .log-container {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .log-header h3 {
+            color: #00ff00;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .clear-log {
+            background: #444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .clear-log:hover {
+            background: #666;
+        }
+
+        .log {
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .log-info { color: #00bfff; }
+        .log-success { color: #00ff00; }
+        .log-warn { color: #ffa500; }
+        .log-error { color: #ff4444; }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 GBSDK + Applixi Test</h1>
+            <p class="subtitle">Test GameBuster SDK with Applixi Ad Network</p>
+            <div class="api-key">
+                API Key: 7c86d490-107f-48c4-ab66-0419cd2d1e34
+            </div>
+        </div>
+
+        <div class="button-grid">
+            <button id="initBtn">🚀 Initialize SDK</button>
+            <button id="interstitialBtn" disabled>📺 Show Interstitial</button>
+            <button id="rewardedBtn" class="rewarded" disabled>💎 Show Rewarded</button>
+            <button id="gameStartBtn" class="game-btn" disabled>▶️ Game Started</button>
+            <button id="gameEndBtn" class="game-btn" disabled>⏹️ Game Ended</button>
+        </div>
+
+        <div class="status-grid">
+            <div class="status-card">
+                <h3>SDK Status</h3>
+                <div class="status-item">
+                    <span class="status-label">Initialized:</span>
+                    <span class="status-value" id="initStatus">❌ No</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Game State:</span>
+                    <span class="status-value" id="gameStatus">⏸️ Not Started</span>
+                </div>
+            </div>
+
+            <div class="status-card">
+                <h3>Ad Availability</h3>
+                <div class="status-item">
+                    <span class="status-label">Interstitial:</span>
+                    <span class="status-value" id="interstitialStatus">❌ No</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Rewarded:</span>
+                    <span class="status-value" id="rewardedStatus">❌ No</span>
+                </div>
+            </div>
+
+            <div class="status-card">
+                <h3>Session Stats</h3>
+                <div class="status-item">
+                    <span class="status-label">Interstitial:</span>
+                    <span class="status-value" id="interstitialCount">0</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Rewarded:</span>
+                    <span class="status-value" id="rewardedCount">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="log-container">
+            <div class="log-header">
+                <h3>📋 Console Log</h3>
+                <button class="clear-log" onclick="clearLog()">Clear</button>
+            </div>
+            <div class="log" id="log"></div>
+        </div>
+    </div>
+
+    <!-- Load GBSDK UMD build -->
+    <script src="../dist/index.js"></script>
+
+    <script>
+        let gbsdk = null;
+
+        // UI elements
+        const initBtn = document.getElementById('initBtn');
+        const interstitialBtn = document.getElementById('interstitialBtn');
+        const rewardedBtn = document.getElementById('rewardedBtn');
+        const gameStartBtn = document.getElementById('gameStartBtn');
+        const gameEndBtn = document.getElementById('gameEndBtn');
+        const logEl = document.getElementById('log');
+
+        // Status elements
+        const initStatus = document.getElementById('initStatus');
+        const interstitialStatus = document.getElementById('interstitialStatus');
+        const rewardedStatus = document.getElementById('rewardedStatus');
+        const interstitialCount = document.getElementById('interstitialCount');
+        const rewardedCount = document.getElementById('rewardedCount');
+        const gameStatus = document.getElementById('gameStatus');
+
+        // Logging with colors
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const icon = {
+                'info': 'ℹ️',
+                'success': '✅',
+                'warn': '⚠️',
+                'error': '❌'
+            }[type] || 'ℹ️';
+
+            const logMessage = document.createElement('div');
+            logMessage.className = `log-${type}`;
+            logMessage.textContent = `[${timestamp}] ${icon} ${message}`;
+            logEl.appendChild(logMessage);
+            logEl.scrollTop = logEl.scrollHeight;
+
+            console.log(`GBSDK Test: ${message}`);
+        }
+
+        function clearLog() {
+            logEl.innerHTML = '';
+        }
+
+        // Update status display
+        function updateStatus() {
+            if (!gbsdk) return;
+
+            initStatus.innerHTML = '✅ Yes';
+            initStatus.className = 'status-value success';
+
+            const canShowInterstitial = gbsdk.canShow('interstitial');
+            const canShowRewarded = gbsdk.canShow('rewarded');
+
+            interstitialStatus.innerHTML = canShowInterstitial ? '✅ Yes' : '❌ No';
+            interstitialStatus.className = canShowInterstitial ? 'status-value success' : 'status-value error';
+
+            rewardedStatus.innerHTML = canShowRewarded ? '✅ Yes' : '❌ No';
+            rewardedStatus.className = canShowRewarded ? 'status-value success' : 'status-value error';
+
+            interstitialBtn.disabled = !canShowInterstitial;
+            rewardedBtn.disabled = !canShowRewarded;
+            gameStartBtn.disabled = false;
+            gameEndBtn.disabled = false;
+
+            // Get session counts
+            try {
+                const sessionData = JSON.parse(sessionStorage.getItem('gbsdk:session') || '{}');
+                interstitialCount.textContent = sessionData.interstitial?.count || 0;
+                rewardedCount.textContent = sessionData.rewarded?.count || 0;
+            } catch (e) {
+                // Ignore
+            }
+        }
+
+        // Initialize SDK
+        async function initializeSDK() {
+            try {
+                initBtn.disabled = true;
+                initBtn.textContent = '⏳ Initializing...';
+                log('Creating GBSDK instance...', 'info');
+
+                gbsdk = new GBSDK.GBSDK();
+
+                // Event listeners
+                gbsdk.on('loaded', () => log('Ad loaded', 'success'));
+                gbsdk.on('started', () => log('Ad started playing', 'success'));
+                gbsdk.on('first_quartile', () => log('Ad 25% complete', 'info'));
+                gbsdk.on('midpoint', () => log('Ad 50% complete', 'info'));
+                gbsdk.on('third_quartile', () => log('Ad 75% complete', 'info'));
+                gbsdk.on('complete', () => log('Ad completed!', 'success'));
+                gbsdk.on('skipped', () => log('Ad skipped', 'warn'));
+                gbsdk.on('error', (data) => log(`Ad error: ${data?.error || 'Unknown'}`, 'error'));
+                gbsdk.on('timeout', () => log('Ad timeout', 'warn'));
+                gbsdk.on('no_fill', () => log('No ad fill from network', 'warn'));
+
+                log('Initializing with Applixi API key...', 'info');
+                log('Note: Applixi may not serve ads from localhost', 'warn');
+                log('Using Google DoubleClick as primary for localhost testing', 'info');
+                await gbsdk.init({
+                    configUrl: './config.applixi.json',
+                    allowDomains: [],
+                    refreshSec: 10,
+                    debug: true
+                });
+
+                log('✨ SDK initialized successfully with Applixi!', 'success');
+                log('Applixi API Key: 7c86d490-107f-48c4-ab66-0419cd2d1e34', 'info');
+                updateStatus();
+
+                setInterval(updateStatus, 1000);
+
+            } catch (error) {
+                log(`Initialization failed: ${error.message}`, 'error');
+                initBtn.disabled = false;
+                initBtn.textContent = '🚀 Initialize SDK';
+            }
+        }
+
+        // Show interstitial ad
+        async function showInterstitial() {
+            try {
+                interstitialBtn.disabled = true;
+                interstitialBtn.textContent = '⏳ Loading...';
+                log('Requesting Applixi interstitial ad...', 'info');
+
+                const result = await gbsdk.showInterstitial();
+
+                if (result.success) {
+                    log('🎉 Interstitial ad completed successfully!', 'success');
+                } else {
+                    log(`Interstitial failed: ${result.reason}`, 'warn');
+                }
+
+                updateStatus();
+
+            } catch (error) {
+                log(`Interstitial error: ${error.message}`, 'error');
+            } finally {
+                interstitialBtn.textContent = '📺 Show Interstitial';
+            }
+        }
+
+        // Show rewarded ad
+        async function showRewarded() {
+            try {
+                rewardedBtn.disabled = true;
+                rewardedBtn.textContent = '⏳ Loading...';
+                log('Requesting Applixi rewarded ad...', 'info');
+
+                const result = await gbsdk.showRewarded();
+
+                if (result.success) {
+                    log('💰 Rewarded ad completed - REWARD GRANTED! 🎉', 'success');
+                } else {
+                    log(`Rewarded failed: ${result.reason} - NO REWARD`, 'warn');
+                }
+
+                updateStatus();
+
+            } catch (error) {
+                log(`Rewarded error: ${error.message}`, 'error');
+            } finally {
+                rewardedBtn.textContent = '💎 Show Rewarded';
+            }
+        }
+
+        // Game started
+        function gameStarted() {
+            if (!gbsdk) return;
+
+            try {
+                gbsdk.gameStarted();
+                gameStatus.textContent = '▶️ Playing';
+                gameStatus.className = 'status-value success';
+                log('Game session started!', 'success');
+            } catch (error) {
+                log(`Game start error: ${error.message}`, 'error');
+            }
+        }
+
+        // Game ended
+        function gameEnded() {
+            if (!gbsdk) return;
+
+            try {
+                gbsdk.gameEnded();
+                gameStatus.textContent = '⏹️ Ended';
+                gameStatus.className = 'status-value';
+                log('Game session ended!', 'success');
+            } catch (error) {
+                log(`Game end error: ${error.message}`, 'error');
+            }
+        }
+
+        // Event listeners
+        initBtn.addEventListener('click', initializeSDK);
+        interstitialBtn.addEventListener('click', showInterstitial);
+        rewardedBtn.addEventListener('click', showRewarded);
+        gameStartBtn.addEventListener('click', gameStarted);
+        gameEndBtn.addEventListener('click', gameEnded);
+
+        // Initial log
+        log('🎮 GBSDK + Applixi Test Page loaded', 'info');
+        log('Click "Initialize SDK" to start testing with Applixi ads', 'info');
+    </script>
+</body>
+</html>
+

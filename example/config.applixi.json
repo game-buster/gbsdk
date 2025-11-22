@@ -1,0 +1,34 @@
+{
+  "version": "1.0.0",
+  "sdkMin": "1.0.0",
+  "cooldownSec": 30,
+  "sessionCap": 50,
+  "interstitial": {
+    "tags": [
+      "https://api.applixi.com/v1/vast?apiKey=7c86d490-107f-48c4-ab66-0419cd2d1e34&type=interstitial&test=1",
+      "https://pubads.g.doubleclick.net/gampad/ads?iu=/21775744923/external/single_preroll_skippable&sz=640x480&ciu_szs=300x250%2C728x90&gdfp_req=1&output=vast&unviewed_position_start=1&env=vp&impl=s&correlator="
+    ],
+    "blockedCountries": []
+  },
+  "rewarded": {
+    "tags": [
+      "https://api.applixi.com/v1/vast?apiKey=7c86d490-107f-48c4-ab66-0419cd2d1e34&type=rewarded&test=1",
+      "https://pubads.g.doubleclick.net/gampad/ads?iu=/21775744923/external/single_preroll_skippable&sz=640x480&ciu_szs=300x250%2C728x90&gdfp_req=1&output=vast&unviewed_position_start=1&env=vp&impl=s&correlator="
+    ],
+    "blockedCountries": []
+  },
+  "featureFlags": {
+    "killInterstitial": false,
+    "killRewarded": false
+  },
+  "ab": {
+    "bucketing": "random",
+    "groups": {
+      "control": {},
+      "test": {
+        "cooldownSec": 20
+      }
+    }
+  }
+}
+
