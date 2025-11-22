@@ -564,11 +564,11 @@ export class GBSDK extends EventEmitter {
 
     // Try different URL patterns
     const patterns = [
-      /\/games?\/([^\/\?]+)/i,        // /games/my-game or /game/my-game
-      /\/g\/([^\/\?]+)/i,             // /g/my-game (Poki style)
-      /\/play\/([^\/\?]+)/i,          // /play/my-game
-      /\/([^\/\?]+)\.html?$/i,        // /my-game.html
-      /game[_-]([^\/\?]+)/i,          // game_my-game or game-my-game
+      /\/games?\/([^/?]+)/i,        // /games/my-game or /game/my-game
+      /\/g\/([^/?]+)/i,             // /g/my-game (Poki style)
+      /\/play\/([^/?]+)/i,          // /play/my-game
+      /\/([^/?]+)\.html?$/i,        // /my-game.html
+      /game[_-]([^/?]+)/i,          // game_my-game or game-my-game
     ];
 
     let gameId = 'unknown-game';
