@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test GB Rewarded Ad</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .log {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #4CAF50;
+            padding-left: 10px;
+        }
+        .log-error {
+            border-left-color: #f44336;
+            color: #f44336;
+        }
+        .log-success {
+            border-left-color: #4CAF50;
+            color: #4CAF50;
+        }
+        .tag-url {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            word-break: break-all;
+            font-size: 11px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Test GameBuster Rewarded Ad</h1>
+        
+        <div class="tag-url">
+            <strong>GB Rewarded Tag:</strong><br>
+            https://pubads.g.doubleclick.net/gampad/ads?iu=/22648522631/gb_rewarded_global&description_url=https%3A%2F%2Fgame-buster.com%2Fplay%2F%5Bgame_slug%5D&tfcd=0&npa=0&sz=640x480&ciu_szs=1x1&gdfp_req=1&unviewed_position_start=1&output=vast&env=vp&impl=s&correlator=
+        </div>
+
+        <button id="initBtn" onclick="initSDK()">1. Initialize SDK</button>
+        <button id="rewardBtn" onclick="showRewarded()" disabled>2. Show Rewarded Ad</button>
+        <button id="clearBtn" onclick="clearLog()">Clear Log</button>
+
+        <div class="log" id="log"></div>
+    </div>
+
+    <script src="./gbsdk.js"></script>
+    <script>
+        let gbsdk = null;
+
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            if (type === 'error') entry.className += ' log-error';
+            if (type === 'success') entry.className += ' log-success';
+            
+            const timestamp = new Date().toLocaleTimeString();
+            entry.textContent = `[${timestamp}] ${message}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        async function initSDK() {
+            try {
+                log('Initializing GBSDK...');
+                gbsdk = new GBSDK.GBSDK();
+
+                // Subscribe to events
+                gbsdk.on('loaded', () => log('✅ Ad loaded', 'success'));
+                gbsdk.on('started', () => log('✅ Ad started', 'success'));
+                gbsdk.on('complete', () => log('✅ Ad completed', 'success'));
+                gbsdk.on('error', (data) => log(`❌ Ad error: ${JSON.stringify(data)}`, 'error'));
+                gbsdk.on('no_fill', () => log('⚠️ No fill', 'error'));
+
+                await gbsdk.init({
+                    config: {
+                        rewardedTags: [
+                            'https://pubads.g.doubleclick.net/gampad/ads?iu=/22648522631/gb_rewarded_global&description_url=https%3A%2F%2Fgame-buster.com%2Fplay%2F%5Bgame_slug%5D&tfcd=0&npa=0&sz=640x480&ciu_szs=1x1&gdfp_req=1&unviewed_position_start=1&output=vast&env=vp&impl=s&correlator='
+                        ],
+                        cooldownSec: 0, // No cooldown for testing
+                        sessionCap: 999
+                    },
+                    debug: true
+                });
+
+                log('✅ SDK initialized successfully', 'success');
+                document.getElementById('initBtn').disabled = true;
+                document.getElementById('rewardBtn').disabled = false;
+
+            } catch (error) {
+                log(`❌ Init error: ${error.message}`, 'error');
+            }
+        }
+
+        async function showRewarded() {
+            try {
+                log('Requesting rewarded ad...');
+                document.getElementById('rewardBtn').disabled = true;
+
+                const result = await gbsdk.showRewarded();
+                
+                if (result.success) {
+                    log('✅ REWARDED AD COMPLETED! Give reward to player!', 'success');
+                } else {
+                    log(`❌ Rewarded ad failed: ${result.reason}`, 'error');
+                }
+
+                // Re-enable button after 3 seconds
+                setTimeout(() => {
+                    document.getElementById('rewardBtn').disabled = false;
+                }, 3000);
+
+            } catch (error) {
+                log(`❌ Show rewarded error: ${error.message}`, 'error');
+                document.getElementById('rewardBtn').disabled = false;
+            }
+        }
+
+        // Auto-init on load
+        window.addEventListener('load', () => {
+            log('Page loaded. Click "Initialize SDK" to start.');
+        });
+    </script>
+</body>
+</html>
+
