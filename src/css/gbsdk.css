@@ -23,6 +23,7 @@
   position: relative;
   max-width: 960px;
   width: 90vw;
+  max-height: 90vh;
   aspect-ratio: 16 / 9;
   background: #000;
   border-radius: 8px;
@@ -76,23 +77,93 @@
 @media (max-width: 768px) {
   .gbsdk-slot {
     width: 95vw;
-    max-height: 80vh;
+    max-height: 85vh;
+    border-radius: 4px;
   }
 
   .gbsdk-close {
-    top: 12px;
-    right: 12px;
+    top: 8px;
+    right: 8px;
+    width: 44px;
+    height: 44px;
+    font-size: 24px;
+  }
+}
+
+/* Mobile landscape mode */
+@media (max-width: 768px) and (orientation: landscape) {
+  .gbsdk-slot {
+    width: auto;
+    height: 90vh;
+    max-width: calc(90vh * 16 / 9);
+  }
+
+  .gbsdk-close {
+    top: 8px;
+    right: 8px;
+    width: 40px;
+    height: 40px;
+    font-size: 22px;
+  }
+}
+
+/* Very small screens (portrait) */
+@media (max-width: 480px) {
+  .gbsdk-slot {
+    width: 98vw;
+    max-height: 90vh;
+    border-radius: 0;
+  }
+
+  .gbsdk-close {
+    top: 4px;
+    right: 4px;
+    width: 48px;
+    height: 48px;
+    font-size: 28px;
+    background: rgba(0, 0, 0, 0.85);
+  }
+}
+
+/* Short screens (landscape on small devices) */
+@media (max-height: 600px) {
+  .gbsdk-slot {
+    height: 85vh;
+    width: auto;
+    max-width: calc(85vh * 16 / 9);
+    aspect-ratio: 16 / 9;
+  }
+
+  .gbsdk-close {
+    top: 4px;
+    right: 4px;
     width: 36px;
     height: 36px;
     font-size: 20px;
   }
 }
 
-@media (max-height: 600px) {
+/* Extra short screens */
+@media (max-height: 400px) {
   .gbsdk-slot {
-    height: 80vh;
+    height: 95vh;
     width: auto;
-    aspect-ratio: 16 / 9;
+    max-width: calc(95vh * 16 / 9);
+  }
+
+  .gbsdk-close {
+    top: 2px;
+    right: 2px;
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+  }
+}
+
+/* iOS Safari viewport fix */
+@supports (-webkit-touch-callout: none) {
+  .gbsdk-overlay {
+    height: -webkit-fill-available;
   }
 }
 

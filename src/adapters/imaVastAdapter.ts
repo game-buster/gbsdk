@@ -65,6 +65,7 @@ export class ImaVastAdapter implements Adapter {
     | ((result: 'ok' | 'skipped' | 'no_fill' | 'error' | 'timeout') => void)
     | null = null;
   private playTimeout: number | null = null;
+  private resizeHandler: (() => void) | null = null;
 
   /**
    * Load the Google IMA SDK
@@ -280,6 +281,9 @@ export class ImaVastAdapter implements Adapter {
         console.log('ImaVastAdapter: Starting ads manager');
       }
 
+      // Setup resize handler for responsive ads
+      this.setupResizeHandler();
+
       this.adsManager.start();
 
       if (this.currentPlayCtx!.debug) {
@@ -294,6 +298,59 @@ export class ImaVastAdapter implements Adapter {
           getMessage: () => (error instanceof Error ? error.message : 'Init error'),
         }),
       });
+    }
+  }
+
+  /**
+   * Setup resize handler for responsive ads
+   */
+  private setupResizeHandler(): void {
+    if (!this.adsManager || !this.currentPlayCtx) return;
+
+    // Remove existing handler if any
+    if (this.resizeHandler) {
+      window.removeEventListener('resize', this.resizeHandler);
+      window.removeEventListener('orientationchange', this.resizeHandler);
+    }
+
+    // Create new handler
+    this.resizeHandler = () => {
+      if (!this.adsManager || !this.currentPlayCtx) return;
+
+      try {
+        const overlayDims = getOverlayDimensions(this.currentPlayCtx.mount.overlay);
+        const videoDims = calculate16x9Dimensions(overlayDims.width, overlayDims.height);
+
+        this.adsManager.resize(
+          videoDims.width,
+          videoDims.height,
+          window.google!.ima.ViewMode.NORMAL
+        );
+
+        if (this.currentPlayCtx.debug) {
+          console.log('ImaVastAdapter: Resized ad to', videoDims);
+        }
+      } catch (error) {
+        // Ignore resize errors
+        if (this.currentPlayCtx?.debug) {
+          console.warn('ImaVastAdapter: Resize failed', error);
+        }
+      }
+    };
+
+    // Add event listeners
+    window.addEventListener('resize', this.resizeHandler);
+    window.addEventListener('orientationchange', this.resizeHandler);
+  }
+
+  /**
+   * Cleanup resize handler
+   */
+  private cleanupResizeHandler(): void {
+    if (this.resizeHandler) {
+      window.removeEventListener('resize', this.resizeHandler);
+      window.removeEventListener('orientationchange', this.resizeHandler);
+      this.resizeHandler = null;
     }
   }
 
@@ -391,6 +448,9 @@ export class ImaVastAdapter implements Adapter {
    * Cleanup resources
    */
   private cleanup(): void {
+    // Cleanup resize handler
+    this.cleanupResizeHandler();
+
     if (this.playTimeout) {
       clearTimeout(this.playTimeout);
       this.playTimeout = null;
