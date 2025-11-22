@@ -223,7 +223,7 @@ export class RemoteConfig {
    * Verify configuration signature (stub implementation)
    * TODO: Implement ed25519 signature verification
    */
-  private async verifySignature(data: string, signature: string): Promise<boolean> {
+  private async verifySignature(_data: string, _signature: string): Promise<boolean> {
     // Stub implementation - always return true when publicKey is not set
     if (!this.options.publicKey) {
       return true;

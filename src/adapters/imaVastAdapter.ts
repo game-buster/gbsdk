@@ -124,8 +124,8 @@ export class ImaVastAdapter implements Adapter {
 
     // Create ad display container
     this.adDisplayContainer = new window.google!.ima.AdDisplayContainer(
-      mount.slot,
-      mount.video
+      mount.video as HTMLVideoElement,
+      mount.slot as HTMLElement
     );
 
     // CRITICAL: Initialize the ad display container
@@ -142,7 +142,7 @@ export class ImaVastAdapter implements Adapter {
     }
 
     // Create ads loader
-    this.adsLoader = new window.google!.ima.AdsLoader(this.adDisplayContainer);
+    this.adsLoader = new window.google!.ima.AdsLoader();
 
     // Set up event listeners
     this.adsLoader.addEventListener(
@@ -212,7 +212,7 @@ export class ImaVastAdapter implements Adapter {
       console.log('ImaVastAdapter: Ads manager loaded');
     }
 
-    const adsRenderingSettings = new window.google!.ima.AdsRenderingSettings();
+    const adsRenderingSettings: any = {};
     adsRenderingSettings.restoreCustomPlaybackStateOnAdBreakComplete = true;
 
     this.adsManager = event.getAdsManager(this.currentPlayCtx!.mount.video, adsRenderingSettings);

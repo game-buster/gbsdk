@@ -50,7 +50,7 @@ export class GAMAdapter implements AdAdapter {
       }
 
       // Initialize googletag command queue
-      window.googletag = window.googletag || { cmd: [] };
+      window.googletag = window.googletag || ({ cmd: [] } as any);
 
       // Load GPT library
       const script = document.createElement('script');
@@ -110,7 +110,7 @@ export class GAMAdapter implements AdAdapter {
             this.currentSlot = window.googletag!.defineOutOfPageSlot(adUnitPath, divId);
           } else {
             const sizes = config.sizes || [[640, 480]];
-            this.currentSlot = window.googletag!.defineSlot(adUnitPath, sizes, divId);
+            this.currentSlot = window.googletag!.defineSlot(adUnitPath, sizes as any, divId);
           }
 
           if (!this.currentSlot) {
@@ -241,7 +241,7 @@ export class GAMAdapter implements AdAdapter {
                 pubads.removeEventListener(impressionViewableListener);
                 pubads.removeEventListener(visibilityChangedListener);
 
-                ctx.onEvent('completed', {});
+                ctx.onEvent('complete', {});
                 this.cleanup(divId, adContainer);
                 resolve('ok');
               }
@@ -266,7 +266,7 @@ export class GAMAdapter implements AdAdapter {
   /**
    * Cleanup ad slot and container
    */
-  private cleanup(divId: string, adContainer: HTMLElement): void {
+  private cleanup(_divId: string, adContainer: HTMLElement): void {
     try {
       // Destroy slot
       if (this.currentSlot) {

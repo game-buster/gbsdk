@@ -55,13 +55,13 @@ export class PrebidAdapter implements AdAdapter {
       }
 
       // Initialize pbjs queue
-      window.pbjs = window.pbjs || { que: [] };
+      window.pbjs = window.pbjs || ({ que: [] } as any);
 
       // Load Prebid.js from CDN
       const script = document.createElement('script');
       script.src = 'https://cdn.jsdelivr.net/npm/prebid.js@latest/dist/prebid.js';
       script.async = true;
-      
+
       script.onload = () => {
         this.loaded = true;
         resolve();
@@ -166,7 +166,7 @@ export class PrebidAdapter implements AdAdapter {
    */
   private handleBidsBack(
     adUnitCode: string,
-    bids: any,
+    _bids: any,
     ctx: PlayCtx,
     resolve: (result: 'ok' | 'skipped' | 'no_fill' | 'error' | 'timeout') => void
   ): void {
@@ -229,7 +229,7 @@ export class PrebidAdapter implements AdAdapter {
    */
   private async playVastAd(
     vastUrl: string | undefined,
-    vastXml: string | undefined,
+    _vastXml: string | undefined,
     ctx: PlayCtx,
     resolve: (result: 'ok' | 'skipped' | 'no_fill' | 'error' | 'timeout') => void
   ): Promise<void> {
