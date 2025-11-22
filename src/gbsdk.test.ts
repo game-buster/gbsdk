@@ -29,13 +29,17 @@ describe('GBSDK', () => {
     it('should return error when not initialized', async () => {
       const result = await sdk.showInterstitial();
       expect(result.success).toBe(false);
-      expect(result.reason).toBe('error');
+      if (!result.success) {
+        expect(result.reason).toBe('error');
+      }
     });
 
     it('should return error for rewarded when not initialized', async () => {
       const result = await sdk.showRewarded();
       expect(result.success).toBe(false);
-      expect(result.reason).toBe('error');
+      if (!result.success) {
+        expect(result.reason).toBe('error');
+      }
     });
   });
 });
