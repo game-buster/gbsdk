@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GBSDK - HTML5 Example</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .status.loading {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status.ready {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            color: #333;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        button {
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-interstitial {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .btn-rewarded {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .btn-game {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 GBSDK Demo</h1>
+        <p class="subtitle">HTML5/JavaScript Integration Example</p>
+        
+        <div id="status" class="status loading">
+            Initializing GBSDK...
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Coins</div>
+                <div class="stat-value" id="coins">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Ads Shown</div>
+                <div class="stat-value" id="adsShown">0</div>
+            </div>
+        </div>
+        
+        <div class="buttons">
+            <button id="interstitialBtn" class="btn-interstitial" disabled>
+                Show Interstitial Ad
+            </button>
+            <button id="rewardedBtn" class="btn-rewarded" disabled>
+                Watch Ad for +100 Coins
+            </button>
+            <button id="gameStartBtn" class="btn-game" disabled>
+                Start Game Session
+            </button>
+        </div>
+        
+        <div class="footer">
+            <p>Powered by <a href="https://github.com/game-buster/gbsdk" target="_blank">GameBuster SDK</a></p>
+        </div>
+    </div>
+
+    <!-- Include GBSDK from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@gamebuster/gbsdk@latest/dist/gbsdk.js"></script>
+    
+    <script>
+        let coins = 0;
+        let adsShown = 0;
+        let gameStarted = false;
+        const gbsdk = new GBSDK.GBSDK();
+
+        // Update UI
+        function updateStats() {
+            document.getElementById('coins').textContent = coins;
+            document.getElementById('adsShown').textContent = adsShown;
+        }
+
+        function setStatus(message, type = 'loading') {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+        }
+
+        // Initialize GBSDK
+        gbsdk.init({ debug: true })
+            .then(() => {
+                setStatus('✅ GBSDK Ready!', 'ready');
+                
+                // Enable buttons
+                document.getElementById('interstitialBtn').disabled = false;
+                document.getElementById('rewardedBtn').disabled = false;
+                document.getElementById('gameStartBtn').disabled = false;
+            })
+            .catch(error => {
+                setStatus('❌ GBSDK Init Failed: ' + error.message, 'error');
+                console.error('GBSDK init failed:', error);
+            });
+
+        // Interstitial button
+        document.getElementById('interstitialBtn').addEventListener('click', async () => {
+            if (gbsdk.canShow('interstitial')) {
+                setStatus('Showing interstitial ad...', 'loading');
+                const result = await gbsdk.showInterstitial();
+                
+                if (result.success) {
+                    adsShown++;
+                    updateStats();
+                    setStatus('✅ Interstitial ad completed!', 'ready');
+                } else {
+                    setStatus('❌ Interstitial failed: ' + result.reason, 'error');
+                }
+            } else {
+                setStatus('⏳ Interstitial ad on cooldown', 'loading');
+            }
+        });
+
+        // Rewarded button
+        document.getElementById('rewardedBtn').addEventListener('click', async () => {
+            if (gbsdk.canShow('rewarded')) {
+                setStatus('Showing rewarded ad...', 'loading');
+                const result = await gbsdk.showRewarded();
+                
+                if (result.success) {
+                    coins += 100;
+                    adsShown++;
+                    updateStats();
+                    setStatus('✅ Reward granted: +100 coins!', 'ready');
+                } else {
+                    setStatus('❌ Rewarded ad failed: ' + result.reason, 'error');
+                }
+            } else {
+                setStatus('⏳ Rewarded ad on cooldown', 'loading');
+            }
+        });
+
+        // Game start button
+        document.getElementById('gameStartBtn').addEventListener('click', () => {
+            if (!gameStarted) {
+                gbsdk.gameStarted();
+                gameStarted = true;
+                document.getElementById('gameStartBtn').textContent = 'End Game Session';
+                setStatus('🎮 Game session started', 'ready');
+            } else {
+                gbsdk.gameEnded();
+                gameStarted = false;
+                document.getElementById('gameStartBtn').textContent = 'Start Game Session';
+                setStatus('🏁 Game session ended', 'ready');
+            }
+        });
+    </script>
+</body>
+</html>
+

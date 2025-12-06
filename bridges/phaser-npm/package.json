@@ -1,0 +1,62 @@
+{
+  "name": "@gamebuster/phaser-3",
+  "version": "1.0.0",
+  "description": "Phaser 3 integration for GameBuster SDK - Production-ready in-game ads with VAST 4.x + Google IMA support",
+  "keywords": [
+    "phaser",
+    "phaser3",
+    "ads",
+    "gaming",
+    "vast",
+    "ima",
+    "interstitial",
+    "rewarded",
+    "gamebuster"
+  ],
+  "author": "GameBuster",
+  "license": "MIT",
+  "homepage": "https://github.com/game-buster/gbsdk#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/game-buster/gbsdk.git",
+    "directory": "bridges/phaser-npm"
+  },
+  "bugs": {
+    "url": "https://github.com/game-buster/gbsdk/issues"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "phaser": "^3.0.0"
+  },
+  "dependencies": {
+    "@gamebuster/gbsdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "phaser": "^3.70.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
+

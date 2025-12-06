@@ -1,0 +1,146 @@
+{
+	"languageTag": "en-US",
+	"fileDescription": "Strings for GameBuster SDK plugin.",
+	"text": {
+		"plugins": {
+			"gamebuster_gbsdk": {
+				"name": "GameBuster SDK",
+				"description": "Production-ready in-game ads SDK with VAST 4.x + Google IMA HTML5 support",
+				"help-url": "https://github.com/game-buster/gbsdk",
+				"properties": {
+					"debug-mode": {
+						"name": "Debug mode",
+						"desc": "Enable debug logging in browser console"
+					},
+					"documentation": {
+						"name": "Documentation",
+						"desc": "Open GBSDK documentation"
+					}
+				},
+				"aceCategories": {
+					"initialization": "Initialization",
+					"ads": "Ads",
+					"misc": "Misc"
+				},
+				"conditions": {
+					"is-initialized": {
+						"list-name": "Is initialized",
+						"display-text": "Is GBSDK initialized",
+						"description": "Check if GBSDK has been initialized"
+					},
+					"on-interstitial-complete": {
+						"list-name": "On interstitial complete",
+						"display-text": "On interstitial complete [i]{0}[/i]",
+						"description": "Triggered when an interstitial ad completes",
+						"params": {
+							"tag": {
+								"name": "Tag",
+								"desc": "Optional tag to identify the ad request (leave empty to match any)"
+							}
+						}
+					},
+					"on-rewarded-complete": {
+						"list-name": "On rewarded complete",
+						"display-text": "On rewarded complete [i]{0}[/i]",
+						"description": "Triggered when a rewarded ad completes",
+						"params": {
+							"tag": {
+								"name": "Tag",
+								"desc": "Optional tag to identify the ad request (leave empty to match any)"
+							}
+						}
+					},
+					"last-ad-success": {
+						"list-name": "Last ad success",
+						"display-text": "Last ad was successful",
+						"description": "Check if the last ad was shown successfully"
+					},
+					"can-show-ad": {
+						"list-name": "Can show ad",
+						"display-text": "Can show {0} ad",
+						"description": "Check if an ad can be shown (respects cooldown)",
+						"params": {
+							"adType": {
+								"name": "Ad type",
+								"desc": "Type of ad to check",
+								"items": {
+									"interstitial": "Interstitial",
+									"rewarded": "Rewarded"
+								}
+							}
+						}
+					},
+					"debug-mode-active": {
+						"list-name": "Debug mode active",
+						"display-text": "Debug mode is active",
+						"description": "Check if debug mode is enabled"
+					}
+				},
+				"actions": {
+					"initialize-sdk": {
+						"list-name": "Initialize SDK",
+						"display-text": "Initialize GBSDK (debug: {0})",
+						"description": "Initialize the GameBuster SDK",
+						"params": {
+							"debug": {
+								"name": "Debug",
+								"desc": "Enable debug logging"
+							}
+						}
+					},
+					"game-started": {
+						"list-name": "Game started",
+						"display-text": "Track game started",
+						"description": "Notify GBSDK that gameplay has started"
+					},
+					"game-ended": {
+						"list-name": "Game ended",
+						"display-text": "Track game ended",
+						"description": "Notify GBSDK that gameplay has ended"
+					},
+					"show-interstitial": {
+						"list-name": "Show interstitial",
+						"display-text": "Show interstitial ad [i]{0}[/i]",
+						"description": "Show an interstitial ad",
+						"params": {
+							"tag": {
+								"name": "Tag",
+								"desc": "Optional tag to identify this ad request"
+							}
+						}
+					},
+					"show-rewarded": {
+						"list-name": "Show rewarded",
+						"display-text": "Show rewarded ad [i]{0}[/i]",
+						"description": "Show a rewarded ad",
+						"params": {
+							"tag": {
+								"name": "Tag",
+								"desc": "Optional tag to identify this ad request"
+							}
+						}
+					}
+				},
+				"expressions": {
+					"last-ad-success": {
+						"translated-name": "LastAdSuccess",
+						"description": "Returns 1 if last ad was successful, 0 otherwise"
+					},
+					"last-ad-reason": {
+						"translated-name": "LastAdReason",
+						"description": "Returns the reason if last ad failed"
+					},
+					"sdk-version": {
+						"translated-name": "SDKVersion",
+						"description": "Returns the GBSDK version"
+					},
+					"last-error": {
+						"translated-name": "LastError",
+						"description": "Returns the last error message"
+					}
+				}
+			}
+		}
+	}
+}
+

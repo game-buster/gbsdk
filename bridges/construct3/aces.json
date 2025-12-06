@@ -1,0 +1,137 @@
+{
+  "initialization": {
+    "actions": [
+      {
+        "id": "initialize-sdk",
+        "scriptName": "InitializeSDK",
+        "highlight": true,
+        "isAsync": true,
+        "params": [
+          {
+            "id": "debug",
+            "type": "boolean",
+            "initialValue": "false"
+          }
+        ]
+      },
+      {
+        "id": "game-started",
+        "scriptName": "GameStarted"
+      },
+      {
+        "id": "game-ended",
+        "scriptName": "GameEnded"
+      }
+    ],
+    "conditions": [
+      {
+        "id": "is-initialized",
+        "scriptName": "IsInitialized"
+      }
+    ]
+  },
+  "ads": {
+    "conditions": [
+      {
+        "id": "on-interstitial-complete",
+        "scriptName": "OnInterstitialComplete",
+        "isTrigger": true,
+        "highlight": true,
+        "params": [
+          {
+            "id": "tag",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "on-rewarded-complete",
+        "scriptName": "OnRewardedComplete",
+        "isTrigger": true,
+        "highlight": true,
+        "params": [
+          {
+            "id": "tag",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "last-ad-success",
+        "scriptName": "LastAdSuccess",
+        "highlight": true
+      },
+      {
+        "id": "can-show-ad",
+        "scriptName": "CanShowAd",
+        "params": [
+          {
+            "id": "adType",
+            "type": "combo",
+            "items": ["interstitial", "rewarded"]
+          }
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "id": "show-interstitial",
+        "scriptName": "ShowInterstitial",
+        "highlight": true,
+        "isAsync": true,
+        "params": [
+          {
+            "id": "tag",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "id": "show-rewarded",
+        "scriptName": "ShowRewarded",
+        "highlight": true,
+        "isAsync": true,
+        "params": [
+          {
+            "id": "tag",
+            "type": "string"
+          }
+        ]
+      }
+    ],
+    "expressions": [
+      {
+        "id": "last-ad-success",
+        "expressionName": "LastAdSuccess",
+        "highlight": true,
+        "returnType": "number"
+      },
+      {
+        "id": "last-ad-reason",
+        "expressionName": "LastAdReason",
+        "returnType": "string"
+      }
+    ]
+  },
+  "misc": {
+    "conditions": [
+      {
+        "id": "debug-mode-active",
+        "scriptName": "DebugModeActive"
+      }
+    ],
+    "expressions": [
+      {
+        "id": "sdk-version",
+        "expressionName": "SDKVersion",
+        "returnType": "string"
+      },
+      {
+        "id": "last-error",
+        "expressionName": "LastError",
+        "returnType": "string"
+      }
+    ]
+  }
+}
+

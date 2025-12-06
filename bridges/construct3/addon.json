@@ -1,0 +1,29 @@
+{
+  "is-c3-addon": true,
+  "type": "plugin",
+  "name": "GameBuster SDK",
+  "id": "GameBuster_GBSDK",
+  "version": "1.0.0",
+  "author": "GameBuster",
+  "website": "https://github.com/game-buster/gbsdk",
+  "documentation": "https://github.com/game-buster/gbsdk#readme",
+  "description": "Production-ready in-game ads SDK with VAST 4.x + Google IMA HTML5 support. Easy integration for interstitial and rewarded video ads.",
+  "editor-scripts": ["plugin.js", "type.js", "instance.js"],
+  "file-list": [
+    "c3runtime/plugin.js",
+    "c3runtime/type.js",
+    "c3runtime/instance.js",
+    "c3runtime/conditions.js",
+    "c3runtime/actions.js",
+    "c3runtime/expressions.js",
+    "c3runtime/domSide.js",
+    "lang/en-US.json",
+    "aces.json",
+    "addon.json",
+    "icon.svg",
+    "instance.js",
+    "plugin.js",
+    "type.js"
+  ]
+}
+

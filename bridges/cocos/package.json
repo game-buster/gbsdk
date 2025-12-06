@@ -1,0 +1,37 @@
+{
+  "name": "gbsdk",
+  "title": "i18n:gbsdk.title",
+  "package_version": 2,
+  "version": "1.0.0",
+  "author": "GameBuster",
+  "description": "i18n:gbsdk.description",
+  "main": "./main.js",
+  "panels": {
+    "default": {
+      "title": "i18n:gbsdk.title",
+      "type": "dockable",
+      "main": "panels/default",
+      "size": {
+        "min-width": 400,
+        "min-height": 300,
+        "width": 800,
+        "height": 600
+      }
+    }
+  },
+  "contributions": {
+    "messages": {
+      "open-panel": {
+        "methods": ["openPanel"]
+      }
+    },
+    "menu": [
+      {
+        "path": "i18n:menu.extension/",
+        "label": "i18n:gbsdk.menubar",
+        "message": "open-panel"
+      }
+    ]
+  }
+}
+

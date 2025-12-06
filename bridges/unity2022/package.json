@@ -1,0 +1,34 @@
+{
+  "name": "com.gamebuster.gbsdk",
+  "version": "1.0.0",
+  "displayName": "GameBuster SDK",
+  "description": "Production-ready in-game ads SDK for Unity WebGL games. Supports VAST 4.x, Google IMA, and multiple ad networks with automatic waterfall optimization.",
+  "unity": "2022.1",
+  "keywords": [
+    "ads",
+    "monetization",
+    "vast",
+    "ima",
+    "webgl",
+    "interstitial",
+    "rewarded"
+  ],
+  "author": {
+    "name": "GameBuster",
+    "url": "https://github.com/game-buster/gbsdk"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/game-buster/gbsdk.git"
+  },
+  "dependencies": {},
+  "samples": [
+    {
+      "displayName": "Basic Integration Example",
+      "description": "Simple example showing how to integrate GBSDK into your Unity game",
+      "path": "Samples~/BasicExample"
+    }
+  ]
+}
+
