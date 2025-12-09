@@ -1,0 +1,39 @@
+{
+  "name": "@game-buster/gbsdk",
+  "version": "1.1.0",
+  "description": "Production-ready, zero-dependency in-game ads SDK with VAST 4.x + Google IMA HTML5 support",
+  "keywords": [
+    "ads",
+    "gaming",
+    "vast",
+    "ima",
+    "interstitial",
+    "rewarded",
+    "html5",
+    "webgl",
+    "unity",
+    "phaser",
+    "construct3"
+  ],
+  "author": "GameBuster <admin@game-buster.com>",
+  "license": "MIT",
+  "homepage": "https://game-buster.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/game-buster/gbsdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/game-buster/gbsdk/issues"
+  },
+  "main": "./dist/gbsdk.js",
+  "browser": "./dist/gbsdk.js",
+  "files": [
+    "dist",
+    "bridges",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
