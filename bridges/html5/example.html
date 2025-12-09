@@ -10,7 +10,7 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -20,7 +20,7 @@
             align-items: center;
             padding: 20px;
         }
-        
+
         .container {
             background: white;
             border-radius: 20px;
@@ -29,74 +29,74 @@
             max-width: 600px;
             width: 100%;
         }
-        
+
         h1 {
             color: #333;
             margin-bottom: 10px;
             font-size: 32px;
         }
-        
+
         .subtitle {
             color: #666;
             margin-bottom: 30px;
             font-size: 14px;
         }
-        
+
         .status {
             padding: 15px;
             border-radius: 10px;
             margin-bottom: 20px;
             font-weight: 500;
         }
-        
+
         .status.loading {
             background: #fff3cd;
             color: #856404;
         }
-        
+
         .status.ready {
             background: #d4edda;
             color: #155724;
         }
-        
+
         .status.error {
             background: #f8d7da;
             color: #721c24;
         }
-        
+
         .stats {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
             margin-bottom: 30px;
         }
-        
+
         .stat-card {
             background: #f8f9fa;
             padding: 20px;
             border-radius: 10px;
             text-align: center;
         }
-        
+
         .stat-label {
             color: #666;
             font-size: 12px;
             text-transform: uppercase;
             margin-bottom: 5px;
         }
-        
+
         .stat-value {
             color: #333;
             font-size: 28px;
             font-weight: bold;
         }
-        
+
         .buttons {
             display: flex;
             flex-direction: column;
             gap: 15px;
         }
-        
+
         button {
             padding: 15px 30px;
             font-size: 16px;
@@ -107,41 +107,41 @@
             transition: all 0.3s ease;
             color: white;
         }
-        
+
         button:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
-        
+
         button:active {
             transform: translateY(0);
         }
-        
+
         button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
         }
-        
+
         .btn-interstitial {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-        
+
         .btn-rewarded {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         }
-        
+
         .btn-game {
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
         }
-        
+
         .footer {
             margin-top: 30px;
             text-align: center;
             color: #666;
             font-size: 12px;
         }
-        
+
         .footer a {
             color: #667eea;
             text-decoration: none;
@@ -152,11 +152,11 @@
     <div class="container">
         <h1>🎮 GBSDK Demo</h1>
         <p class="subtitle">HTML5/JavaScript Integration Example</p>
-        
+
         <div id="status" class="status loading">
             Initializing GBSDK...
         </div>
-        
+
         <div class="stats">
             <div class="stat-card">
                 <div class="stat-label">Coins</div>
@@ -167,7 +167,7 @@
                 <div class="stat-value" id="adsShown">0</div>
             </div>
         </div>
-        
+
         <div class="buttons">
             <button id="interstitialBtn" class="btn-interstitial" disabled>
                 Show Interstitial Ad
@@ -179,15 +179,15 @@
                 Start Game Session
             </button>
         </div>
-        
+
         <div class="footer">
             <p>Powered by <a href="https://github.com/game-buster/gbsdk" target="_blank">GameBuster SDK</a></p>
         </div>
     </div>
 
-    <!-- Include GBSDK from CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@gamebuster/gbsdk@latest/dist/gbsdk.js"></script>
-    
+    <!-- Include GBSDK from official CDN -->
+    <script src="https://cdn.game-buster.com/gbsdk.js"></script>
+
     <script>
         let coins = 0;
         let adsShown = 0;
@@ -210,7 +210,7 @@
         gbsdk.init({ debug: true })
             .then(() => {
                 setStatus('✅ GBSDK Ready!', 'ready');
-                
+
                 // Enable buttons
                 document.getElementById('interstitialBtn').disabled = false;
                 document.getElementById('rewardedBtn').disabled = false;
@@ -226,7 +226,7 @@
             if (gbsdk.canShow('interstitial')) {
                 setStatus('Showing interstitial ad...', 'loading');
                 const result = await gbsdk.showInterstitial();
-                
+
                 if (result.success) {
                     adsShown++;
                     updateStats();
@@ -244,7 +244,7 @@
             if (gbsdk.canShow('rewarded')) {
                 setStatus('Showing rewarded ad...', 'loading');
                 const result = await gbsdk.showRewarded();
-                
+
                 if (result.success) {
                     coins += 100;
                     adsShown++;

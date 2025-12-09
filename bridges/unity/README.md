@@ -4,42 +4,84 @@ This guide shows how to integrate GBSDK into your Unity WebGL game using the pro
 
 ## 📦 Installation
 
-### Step 1: Download Files
+### Method 1: Using GameBuster WebGL Template (Recommended - Easiest!)
 
-Copy these files to your Unity project:
+1. **Copy the WebGL Template:**
+   - Copy the entire `WebGLTemplates/GameBuster/` folder to your Unity project's `Assets/` directory
+   - Result: `Assets/WebGLTemplates/GameBuster/`
 
-1. **GBSDK.cs** → `Assets/Scripts/` (or any Scripts folder)
-2. **GBSDK.jslib** → `Assets/Plugins/WebGL/`
-3. **GBSDKBridge.prefab** → `Assets/Prefabs/` (create this prefab)
+2. **Select the Template:**
+   - Go to `Edit → Project Settings → Player`
+   - Select the `WebGL` tab
+   - Under `Resolution and Presentation`, find `WebGL Template`
+   - Select `GameBuster` from the dropdown
 
-### Step 2: Create Bridge GameObject
+3. **Add GBSDK Scripts:**
+   - Copy `GBSDK.cs` → `Assets/Scripts/` (or any Scripts folder)
+   - Copy `GBSDK.jslib` → `Assets/Plugins/WebGL/`
 
-1. Create an empty GameObject in your scene
-2. Name it "GBSDKBridge"
-3. Add the `GBSDKBridge` component to it
-4. Save it as a prefab for reuse
+4. **Done!** The template automatically includes the GBSDK script from CDN.
 
-### Step 3: Include GBSDK Script in WebGL Template
+**Features:**
+- ✅ Modern loading screen with GameBuster logo (from CDN)
+- ✅ Animated progress bar with shimmer effect
+- ✅ Real-time loading percentage display (0-100%)
+- ✅ Dynamic loading status messages
+- ✅ Smooth fade-out transition when loading completes
+- ✅ Beautiful purple gradient background
+- ✅ Pulsing logo animation
+- ✅ Fullscreen support
+- ✅ Mobile responsive
+- ✅ GBSDK auto-loaded from CDN
 
-Add the GBSDK script to your WebGL template's `index.html`:
+---
 
-```html
-<!DOCTYPE html>
-<html>
-<head>
-    <!-- Your existing head content -->
-    
-    <!-- Add GBSDK script BEFORE Unity loader -->
-    <script src="https://unpkg.com/@gamebuster/gbsdk@latest/dist/index.umd.js"></script>
-</head>
-<body>
-    <!-- Your Unity content -->
-    <script>
-        // Unity WebGL loader code
-    </script>
-</body>
-</html>
+### Method 2: Manual Installation (Custom Template)
+
+If you want to use your own WebGL template:
+
+1. **Add GBSDK Scripts:**
+   - Copy `GBSDK.cs` → `Assets/Scripts/`
+   - Copy `GBSDK.jslib` → `Assets/Plugins/WebGL/`
+
+2. **Modify Your WebGL Template:**
+
+   Add the GBSDK script to your template's `index.html` (BEFORE Unity loader):
+
+   ```html
+   <!DOCTYPE html>
+   <html>
+   <head>
+       <!-- Your existing head content -->
+
+       <!-- Add GBSDK script BEFORE Unity loader -->
+       <script src="https://cdn.game-buster.com/gbsdk.js"></script>
+   </head>
+   <body>
+       <!-- Your Unity content -->
+       <script>
+           // Unity WebGL loader code
+       </script>
+   </body>
+   </html>
+   ```
+
+---
+
+### Method 3: UPM Package (Unity Package Manager)
+
 ```
+1. Open Unity Package Manager (Window → Package Manager)
+2. Click the '+' button → Add package from git URL
+3. Enter: https://github.com/mertmisirlioglu/gbsdk.git?path=/bridges/unity
+4. Click 'Add'
+```
+
+The package includes:
+- ✅ GBSDK.cs (C# wrapper)
+- ✅ GBSDK.jslib (JavaScript bridge)
+- ✅ WebGL Template (pre-configured)
+- ✅ Example scripts
 
 ## 🚀 Basic Usage
 
@@ -307,7 +349,7 @@ Create a custom WebGL template with GBSDK:
     <title>Unity WebGL Player | {{{ PRODUCT_NAME }}}</title>
     
     <!-- GBSDK Script -->
-    <script src="https://unpkg.com/@gamebuster/gbsdk@latest/dist/index.umd.js"></script>
+    <script src="https://cdn.game-buster.com/gbsdk.js"></script>
 </head>
 <body>
     <div id="unity-container">

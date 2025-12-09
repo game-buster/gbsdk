@@ -16,32 +16,45 @@ var GBSDKPlugin = {
 
         console.log('GBSDK Unity Plugin: Auto-initializing with debug =', debugMode);
 
-        try {
-            // Create GBSDK instance
-            if (typeof GBSDK === 'undefined' || typeof GBSDK.GBSDK === 'undefined') {
-                console.error('GBSDK not found. Make sure to include the GBSDK script in your HTML.');
+        // Wait for GBSDK to be available before initializing
+        var maxAttempts = 50; // 5 seconds max
+        var attempt = 0;
+
+        var checkAndInit = function() {
+            attempt++;
+
+            if (typeof GBSDK !== 'undefined' && typeof GBSDK.GBSDK !== 'undefined') {
+                // GBSDK is ready, initialize it
+                try {
+                    GBSDKPlugin.gbsdk = new GBSDK.GBSDK();
+
+                    // Use auto-initialization (no config needed)
+                    var autoConfig = debugMode ? { debug: true } : {};
+
+                    GBSDKPlugin.gbsdk.init(autoConfig).then(function() {
+                        GBSDKPlugin.isInitialized = true;
+                        console.log('GBSDK auto-initialized successfully');
+                        SendMessage(callbackObject, callbackMethod, 'success');
+                    }).catch(function(error) {
+                        console.error('GBSDK auto-initialization failed:', error);
+                        SendMessage(callbackObject, callbackMethod, 'error');
+                    });
+                } catch (error) {
+                    console.error('GBSDK auto-init error:', error);
+                    SendMessage(callbackObject, callbackMethod, 'error');
+                }
+            } else if (attempt < maxAttempts) {
+                // GBSDK not ready yet, wait and retry
+                setTimeout(checkAndInit, 100);
+            } else {
+                // Timeout - GBSDK failed to load
+                console.error('GBSDK not found after ' + (maxAttempts * 100) + 'ms. Make sure to include the GBSDK script in your HTML.');
                 SendMessage(callbackObject, callbackMethod, 'error');
-                return;
             }
+        };
 
-            GBSDKPlugin.gbsdk = new GBSDK.GBSDK();
-
-            // Use auto-initialization (no config needed)
-            var autoConfig = debugMode ? { debug: true } : {};
-
-            GBSDKPlugin.gbsdk.init(autoConfig).then(function() {
-                GBSDKPlugin.isInitialized = true;
-                console.log('GBSDK auto-initialized successfully');
-                SendMessage(callbackObject, callbackMethod, 'success');
-            }).catch(function(error) {
-                console.error('GBSDK auto-initialization failed:', error);
-                SendMessage(callbackObject, callbackMethod, 'error');
-            });
-
-        } catch (error) {
-            console.error('GBSDK auto-init error:', error);
-            SendMessage(callbackObject, callbackMethod, 'error');
-        }
+        // Start checking
+        checkAndInit();
     },
 
     // Initialize GBSDK with custom configuration (advanced usage)
@@ -50,33 +63,45 @@ var GBSDKPlugin = {
         var callbackObject = UTF8ToString(callbackObjectPtr);
         var callbackMethod = UTF8ToString(callbackMethodPtr);
 
-        try {
-            // Parse configuration
-            var config = JSON.parse(configJson);
+        // Wait for GBSDK to be available before initializing
+        var maxAttempts = 50; // 5 seconds max
+        var attempt = 0;
 
-            // Create GBSDK instance
-            if (typeof GBSDK === 'undefined' || typeof GBSDK.GBSDK === 'undefined') {
-                console.error('GBSDK not found. Make sure to include the GBSDK script in your HTML.');
+        var checkAndInit = function() {
+            attempt++;
+
+            if (typeof GBSDK !== 'undefined' && typeof GBSDK.GBSDK !== 'undefined') {
+                // GBSDK is ready, initialize it
+                try {
+                    // Parse configuration
+                    var config = JSON.parse(configJson);
+                    GBSDKPlugin.gbsdk = new GBSDK.GBSDK();
+
+                    // Initialize with custom config
+                    GBSDKPlugin.gbsdk.init(config).then(function() {
+                        GBSDKPlugin.isInitialized = true;
+                        console.log('GBSDK initialized successfully with custom config');
+                        SendMessage(callbackObject, callbackMethod, 'success');
+                    }).catch(function(error) {
+                        console.error('GBSDK initialization failed:', error);
+                        SendMessage(callbackObject, callbackMethod, 'error');
+                    });
+                } catch (error) {
+                    console.error('GBSDK init error:', error);
+                    SendMessage(callbackObject, callbackMethod, 'error');
+                }
+            } else if (attempt < maxAttempts) {
+                // GBSDK not ready yet, wait and retry
+                setTimeout(checkAndInit, 100);
+            } else {
+                // Timeout - GBSDK failed to load
+                console.error('GBSDK not found after ' + (maxAttempts * 100) + 'ms. Make sure to include the GBSDK script in your HTML.');
                 SendMessage(callbackObject, callbackMethod, 'error');
-                return;
             }
+        };
 
-            GBSDKPlugin.gbsdk = new GBSDK.GBSDK();
-
-            // Initialize with custom config
-            GBSDKPlugin.gbsdk.init(config).then(function() {
-                GBSDKPlugin.isInitialized = true;
-                console.log('GBSDK initialized successfully with custom config');
-                SendMessage(callbackObject, callbackMethod, 'success');
-            }).catch(function(error) {
-                console.error('GBSDK initialization failed:', error);
-                SendMessage(callbackObject, callbackMethod, 'error');
-            });
-
-        } catch (error) {
-            console.error('GBSDK init error:', error);
-            SendMessage(callbackObject, callbackMethod, 'error');
-        }
+        // Start checking
+        checkAndInit();
     },
 
     // Show interstitial ad

@@ -1,6 +1,6 @@
 # GBSDK - GameBuster Ads SDK
 
-A lightweight, zero-dependency in-game ads SDK for web games with VAST 4.x + Google IMA HTML5 support.
+A lightweight in-game ads SDK for web games with VAST 4.x + Google IMA HTML5 support.
 
 [![npm version](https://badge.fury.io/js/%40game-buster%2Fgbsdk.svg)](https://www.npmjs.com/package/@game-buster/gbsdk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -11,7 +11,6 @@ A lightweight, zero-dependency in-game ads SDK for web games with VAST 4.x + Goo
 - **5 simple methods** - `init()`, `showInterstitial()`, `showRewarded()`, `gameStarted()`, `gameEnded()`
 - **Zero runtime dependencies** - Pure JavaScript, no external libs
 - **VAST 4.x + Google IMA HTML5** - Industry standard video ads
-- **Automatic configuration** - Config managed by GameBuster platform
 - **Cross-platform** - Works in Unity WebGL, HTML5 games, and all major game engines
 - **TypeScript support** - Full type definitions included
 
@@ -20,7 +19,7 @@ A lightweight, zero-dependency in-game ads SDK for web games with VAST 4.x + Goo
 ### CDN (Recommended for most games)
 
 ```html
-<script src="https://unpkg.com/@game-buster/gbsdk@latest/dist/gbsdk.js"></script>
+<script src="https://cdn.game-buster.com/gbsdk.js"></script>
 ```
 
 ### NPM/Yarn (For bundled projects)
@@ -37,7 +36,7 @@ yarn add @game-buster/gbsdk
 // Create SDK instance
 const gbsdk = new GBSDK.GBSDK();
 
-// 1. Initialize SDK (config is automatically loaded from GameBuster)
+// 1. Initialize SDK
 await gbsdk.init();
 
 // 2. Track game session
@@ -59,7 +58,7 @@ gbsdk.gameEnded();
 ### Core Methods
 
 #### `init(): Promise<void>`
-Initialize the SDK. Configuration is automatically loaded from GameBuster platform.
+Initialize the SDK.
 
 ```javascript
 await gbsdk.init();
@@ -115,18 +114,18 @@ GBSDK provides official integrations for all major game engines:
 
 | Platform | Status | Documentation |
 |----------|--------|---------------|
-| **Unity 2022+/Unity 6** | ✅ Ready | [Guide](./bridges/unity2022/README.md) |
-| **Construct 3** | ✅ Ready | [Guide](./bridges/construct3/README.md) |
-| **Godot 4.x** | ✅ Ready | [Guide](./bridges/godot/README.md) |
-| **Cocos Creator 3.x** | ✅ Ready | [Guide](./bridges/cocos/README.md) |
-| **Phaser 3** | ✅ Ready | [Guide](./bridges/phaser-npm/README.md) |
-| **HTML5/JavaScript** | ✅ Ready | [Guide](./bridges/html5/README.md) |
+| **Unity 2022+/Unity 6** | ✅ Ready | [Guide](https://github.com/game-buster/gbsdk/tree/main/bridges/unity2022) |
+| **Construct 3** | ✅ Ready | [Guide](https://github.com/game-buster/gbsdk/tree/main/bridges/construct3) |
+| **Godot 4.x** | ✅ Ready | [Guide](https://github.com/game-buster/gbsdk/tree/main/bridges/godot) |
+| **Cocos Creator 3.x** | ✅ Ready | [Guide](https://github.com/game-buster/gbsdk/tree/main/bridges/cocos) |
+| **Phaser 3** | ✅ Ready | [Guide](https://github.com/game-buster/gbsdk/tree/main/bridges/phaser-npm) |
+| **HTML5/JavaScript** | ✅ Ready | [Guide](https://github.com/game-buster/gbsdk/tree/main/bridges/html5) |
 
 ## 🎮 Game Engine Integration Guides
 
 ### Unity WebGL
 
-**Unity 2022+ / Unity 6**: See [Unity Integration Guide](./bridges/unity2022/README.md)
+**Unity 2022+ / Unity 6**: See [Unity Integration Guide](https://github.com/game-buster/gbsdk/tree/main/bridges/unity2022)
 
 ```csharp
 // Unity C# example
@@ -153,13 +152,13 @@ public class AdManager : MonoBehaviour
 
 ### Construct 3
 
-Install the addon from `bridges/construct3/` - See [Construct 3 Guide](./bridges/construct3/README.md)
+Install the addon from `bridges/construct3/` - See [Construct 3 Guide](https://github.com/game-buster/gbsdk/tree/main/bridges/construct3)
 
 The addon provides Actions, Conditions, and Expressions for easy integration without coding.
 
 ### Godot 4.x
 
-Install the plugin from `bridges/godot/addons/gbsdk/` - See [Godot Guide](./bridges/godot/README.md)
+Install the plugin from `bridges/godot/addons/gbsdk/` - See [Godot Guide](https://github.com/game-buster/gbsdk/tree/main/bridges/godot)
 
 ```gdscript
 extends Node
@@ -182,7 +181,7 @@ func _on_rewarded_done(success: bool, reason: String):
 
 ### Cocos Creator 3.x
 
-Install the extension from `bridges/cocos/` - See [Cocos Creator Guide](./bridges/cocos/README.md)
+Install the extension from `bridges/cocos/` - See [Cocos Creator Guide](https://github.com/game-buster/gbsdk/tree/main/bridges/cocos)
 
 ```typescript
 import { GBSDK } from './gbsdk-api/GBSDK';
@@ -202,7 +201,7 @@ async showRewardedAd() {
 
 ### Phaser 3
 
-Install via NPM: `npm install @game-buster/phaser-3` - See [Phaser 3 Guide](./bridges/phaser-npm/README.md)
+Install via NPM: `npm install @game-buster/phaser-3` - See [Phaser 3 Guide](https://github.com/game-buster/gbsdk/tree/main/bridges/phaser-npm)
 
 ```typescript
 import { PhaserGBSDK } from '@game-buster/phaser-3';
@@ -230,13 +229,13 @@ class GameScene extends Phaser.Scene {
 
 ### HTML5 Games (Vanilla JS)
 
-See [HTML5 Integration Guide](./bridges/html5/README.md)
+See [HTML5 Integration Guide](https://github.com/game-buster/gbsdk/tree/main/bridges/html5)
 
 ```html
 <!DOCTYPE html>
 <html>
 <head>
-    <script src="https://unpkg.com/@game-buster/gbsdk@latest/dist/gbsdk.js"></script>
+    <script src="https://cdn.game-buster.com/gbsdk.js"></script>
 </head>
 <body>
     <button onclick="showRewardedAd()">Watch Ad for Coins</button>
@@ -286,7 +285,6 @@ See [HTML5 Integration Guide](./bridges/html5/README.md)
 #### "Ad failed to load"
 - Check network connectivity
 - Ensure you called `init()` before showing ads
-- Make sure the game is uploaded to GameBuster platform
 
 #### "User gesture required"
 - First ad call must be from user interaction (button click)
@@ -328,6 +326,6 @@ MIT License - see [LICENSE](./LICENSE) file for details.
 
 ## 🤝 Support
 
-- **Documentation**: [Full integration guides](./bridges/)
+- **Documentation**: [Full integration guides](https://github.com/game-buster/gbsdk/tree/main/bridges)
 - **Issues**: [GitHub Issues](https://github.com/game-buster/gbsdk/issues)
 - **Platform**: [GameBuster Dashboard](https://game-buster.com)

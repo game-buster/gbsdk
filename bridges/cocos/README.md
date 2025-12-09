@@ -25,7 +25,7 @@ The extension will automatically copy the GBSDK API files to `assets/gbsdk-api/`
 Add this to your `index.html` or build template:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@gamebuster/gbsdk@latest/dist/gbsdk.js"></script>
+<script src="https://cdn.game-buster.com/gbsdk.js"></script>
 ```
 
 ### 2. Initialize in Your Game

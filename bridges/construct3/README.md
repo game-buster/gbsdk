@@ -95,7 +95,7 @@ On game over
 Make sure your exported HTML includes the GBSDK script. The plugin automatically loads it from CDN, but you can also include it manually:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@gamebuster/gbsdk@latest/dist/gbsdk.js"></script>
+<script src="https://cdn.game-buster.com/gbsdk.js"></script>
 ```
 
 ## Support

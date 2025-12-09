@@ -145,7 +145,7 @@ GBSDK.initialize_gbsdk(config)
 Make sure your exported HTML includes the GBSDK script. Add this to your export template or HTML file:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@gamebuster/gbsdk@latest/dist/gbsdk.js"></script>
+<script src="https://cdn.game-buster.com/gbsdk.js"></script>
 ```
 
 ## Testing

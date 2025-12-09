@@ -7,7 +7,7 @@ Production-ready in-game ads SDK for vanilla JavaScript/HTML5 games with VAST 4.
 ### CDN (Recommended)
 
 ```html
-<script src="https://unpkg.com/@game-buster/gbsdk@latest/dist/gbsdk.js"></script>
+<script src="https://cdn.game-buster.com/gbsdk.js"></script>
 ```
 
 ### NPM
@@ -36,7 +36,7 @@ Then in your HTML:
     <canvas id="gameCanvas"></canvas>
 
     <!-- Include GBSDK -->
-    <script src="https://unpkg.com/@game-buster/gbsdk@latest/dist/gbsdk.js"></script>
+    <script src="https://cdn.game-buster.com/gbsdk.js"></script>
 
     <!-- Your game code -->
     <script src="game.js"></script>
@@ -143,7 +143,7 @@ function gameOver() {
     <button id="rewardedBtn">Watch Ad for Coins (Rewarded)</button>
     <p>Coins: <span id="coins">0</span></p>
 
-    <script src="https://unpkg.com/@game-buster/gbsdk@latest/dist/gbsdk.js"></script>
+    <script src="https://cdn.game-buster.com/gbsdk.js"></script>
     <script>
         let coins = 0;
         const gbsdk = new GBSDK.GBSDK();

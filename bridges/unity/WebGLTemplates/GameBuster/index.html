@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>{{{ PRODUCT_NAME }}} - Powered by GameBuster</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+    <script>
+      // Pre-initialize GBSDKPlugin stub to prevent "not defined" errors
+      // This will be replaced by the actual plugin when Unity framework loads
+      window.GBSDKPlugin = window.GBSDKPlugin || {
+        gbsdk: null,
+        isInitialized: false
+      };
+
+      // Stub function that will be called if Unity tries to init before framework is ready
+      window._GBSDKInitAuto = window._GBSDKInitAuto || function() {
+        console.warn('GBSDK init called before plugin loaded, deferring...');
+      };
+    </script>
+  </head>
+  <body>
+    <div id="unity-container" class="unity-desktop">
+      <canvas id="unity-canvas"></canvas>
+      <div id="unity-loading-bar">
+        <div id="unity-logo"></div>
+        <div id="loading-text">Loading...</div>
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
+        </div>
+        <div id="loading-percentage">0%</div>
+        <div id="powered-by">Powered by GameBuster</div>
+      </div>
+      <div id="unity-warning"> </div>
+    </div>
+    <script>
+      var container = document.querySelector("#unity-container");
+      var canvas = document.querySelector("#unity-canvas");
+      var loadingBar = document.querySelector("#unity-loading-bar");
+      var progressBarFull = document.querySelector("#unity-progress-bar-full");
+      var loadingPercentage = document.querySelector("#loading-percentage");
+      var loadingText = document.querySelector("#loading-text");
+      var warningBanner = document.querySelector("#unity-warning");
+
+      // Progress tracking
+      var currentProgress = 0;
+      var targetProgress = 0;
+      var progressInterval = null;
+
+      // Smoothly animate progress bar
+      function animateProgress() {
+        if (currentProgress < targetProgress) {
+          // Smooth increment
+          var diff = targetProgress - currentProgress;
+          var increment = Math.max(0.5, diff * 0.1);
+          currentProgress = Math.min(currentProgress + increment, targetProgress);
+
+          // Update UI
+          progressBarFull.style.width = currentProgress + "%";
+          loadingPercentage.textContent = Math.round(currentProgress) + "%";
+        }
+
+        if (currentProgress >= 100) {
+          clearInterval(progressInterval);
+        }
+      }
+
+      // Start progress animation
+      progressInterval = setInterval(animateProgress, 16); // 60fps
+
+      // Update target progress
+      function setProgress(progress) {
+        targetProgress = Math.min(100, Math.max(0, progress));
+      }
+
+      // Shows a temporary message banner/ribbon for a few seconds, or
+      // a permanent error message on top of the canvas if type=='error'.
+      function unityShowBanner(msg, type) {
+        function updateBannerVisibility() {
+          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+        }
+        var div = document.createElement('div');
+        div.innerHTML = msg;
+        warningBanner.appendChild(div);
+        if (type == 'error') div.style = 'background: red; padding: 10px;';
+        else {
+          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+          setTimeout(function() {
+            warningBanner.removeChild(div);
+            updateBannerVisibility();
+          }, 5000);
+        }
+        updateBannerVisibility();
+      }
+
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}";
+      var config = {
+        dataUrl: buildUrl + "/{{{ DATA_FILENAME }}}",
+        frameworkUrl: buildUrl + "/{{{ FRAMEWORK_FILENAME }}}",
+#if USE_WASM
+        codeUrl: buildUrl + "/{{{ CODE_FILENAME }}}",
+#endif
+#if MEMORY_FILENAME
+        memoryUrl: buildUrl + "/{{{ MEMORY_FILENAME }}}",
+#endif
+#if SYMBOLS_FILENAME
+        symbolsUrl: buildUrl + "/{{{ SYMBOLS_FILENAME }}}",
+#endif
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
+        productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
+        productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
+        showBanner: unityShowBanner,
+      };
+
+      // Unity will match WebGL canvas render target size with DOM size
+      config.matchWebGLToCanvasSize = true;
+
+      // Set viewport for all devices - fullscreen mode
+      var meta = document.createElement('meta');
+      meta.name = 'viewport';
+      meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+      document.getElementsByTagName('head')[0].appendChild(meta);
+
+      // Calculate canvas size maintaining aspect ratio
+      function resizeCanvas() {
+        var gameAspect = {{{ WIDTH }}} / {{{ HEIGHT }}};
+        var windowWidth = window.innerWidth;
+        var windowHeight = window.innerHeight;
+        var windowAspect = windowWidth / windowHeight;
+
+        var canvasWidth, canvasHeight;
+
+        if (windowAspect > gameAspect) {
+          // Window is wider than game - fit to height
+          canvasHeight = windowHeight;
+          canvasWidth = canvasHeight * gameAspect;
+        } else {
+          // Window is taller than game - fit to width
+          canvasWidth = windowWidth;
+          canvasHeight = canvasWidth / gameAspect;
+        }
+
+        canvas.style.width = canvasWidth + 'px';
+        canvas.style.height = canvasHeight + 'px';
+      }
+
+      // Initial resize
+      resizeCanvas();
+
+      // Resize on window resize
+      window.addEventListener('resize', resizeCanvas);
+
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        // Mobile device style
+        container.className = "unity-mobile";
+        canvas.className = "unity-mobile";
+
+        // To lower canvas resolution on mobile devices to gain some
+        // performance, uncomment the following line:
+        // config.devicePixelRatio = 1;
+      } else {
+        // Desktop style: fullscreen mode
+        container.className = "unity-desktop";
+      }
+
+#if BACKGROUND_FILENAME
+      canvas.style.background = "url('" + buildUrl + "/{{{ BACKGROUND_FILENAME.replace(/'/g, '%27') }}}') center / cover";
+#endif
+      loadingBar.style.display = "block";
+
+      // Phase 1: Load external scripts (0-15%)
+      loadingText.textContent = "Loading SDK...";
+      setProgress(5);
+
+      // Load Google IMA SDK and GBSDK first, then Unity
+      function loadGoogleIMA() {
+        return new Promise((resolve, reject) => {
+          setProgress(8);
+          var script = document.createElement("script");
+          script.src = "https://imasdk.googleapis.com/js/sdkloader/ima3.js";
+          script.onload = () => {
+            console.log("Google IMA SDK loaded successfully");
+            setProgress(12);
+            resolve();
+          };
+          script.onerror = () => {
+            console.warn("Google IMA SDK failed to load");
+            setProgress(12);
+            resolve(); // Continue anyway
+          };
+          document.head.appendChild(script);
+        });
+      }
+
+      function loadGBSDK() {
+        return new Promise((resolve, reject) => {
+          var script = document.createElement("script");
+          script.src = "https://cdn.game-buster.com/gbsdk.js";
+          script.onload = () => {
+            console.log("GBSDK loaded successfully");
+            setProgress(15);
+            resolve();
+          };
+          script.onerror = () => {
+            console.warn("GBSDK failed to load from CDN");
+            setProgress(15);
+            resolve(); // Continue anyway
+          };
+          document.head.appendChild(script);
+        });
+      }
+
+      // Load Unity after GBSDK is ready
+      function loadUnity() {
+        loadingText.textContent = "Loading game engine...";
+        setProgress(18);
+
+        var script = document.createElement("script");
+        script.src = loaderUrl;
+        script.onload = () => {
+          loadingText.textContent = "Loading game assets...";
+          setProgress(20);
+
+          createUnityInstance(canvas, config, (progress) => {
+            // Map Unity progress (0-1) to our progress (20-100)
+            var unityProgress = 20 + (progress * 80);
+            setProgress(unityProgress);
+
+            // Update loading text based on progress
+            if (progress < 0.3) {
+              loadingText.textContent = "Loading game assets...";
+            } else if (progress < 0.6) {
+              loadingText.textContent = "Preparing game...";
+            } else if (progress < 0.9) {
+              loadingText.textContent = "Almost ready...";
+            } else {
+              loadingText.textContent = "Starting...";
+            }
+          }).then((unityInstance) => {
+            // Final push to 100%
+            setProgress(100);
+            loadingText.textContent = "Ready!";
+
+            // Smooth fade out of loading screen
+            setTimeout(() => {
+              loadingBar.style.opacity = "0";
+              setTimeout(() => {
+                loadingBar.style.display = "none";
+                clearInterval(progressInterval);
+              }, 300);
+            }, 200);
+
+            console.log("Unity loaded successfully!");
+            console.log("GBSDK available:", typeof GBSDK !== 'undefined');
+          }).catch((message) => {
+            alert(message);
+          });
+        };
+        document.body.appendChild(script);
+      }
+
+      // Start loading sequence: Google IMA SDK, then GBSDK, then Unity
+      loadGoogleIMA()
+        .then(() => loadGBSDK())
+        .then(() => {
+          console.log("Starting Unity...");
+          loadUnity();
+        });
+    </script>
+  </body>
+</html>

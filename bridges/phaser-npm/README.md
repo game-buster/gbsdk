@@ -17,7 +17,7 @@ yarn add @gamebuster/phaser-3
 Add this to your `index.html`:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@gamebuster/gbsdk@latest/dist/gbsdk.js"></script>
+<script src="https://cdn.game-buster.com/gbsdk.js"></script>
 ```
 
 ### 2. Import in Your Game

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <title>GBSDK Load Test</title>
+</head>
+<body>
+    <h1>GBSDK Load Test</h1>
+    <div id="status">Loading GBSDK...</div>
+
+    <!-- GameBuster SDK - Load from official CDN -->
+    <script src="https://cdn.game-buster.com/gbsdk.js"></script>
+
+    <script>
+        console.log("Script started");
+        console.log("GBSDK type:", typeof GBSDK);
+
+        // Check if GBSDK is loaded
+        function checkGBSDK() {
+            var status = document.getElementById('status');
+
+            if (typeof GBSDK !== 'undefined') {
+                console.log("✅ GBSDK loaded successfully!");
+                console.log("GBSDK object:", GBSDK);
+                console.log("GBSDK.GBSDK class:", GBSDK.GBSDK);
+                status.innerHTML = "✅ GBSDK loaded successfully!<br>GBSDK.GBSDK: " + (typeof GBSDK.GBSDK);
+                status.style.color = "green";
+
+                // Try to create instance
+                try {
+                    var sdk = new GBSDK.GBSDK();
+                    console.log("✅ GBSDK instance created:", sdk);
+                    status.innerHTML += "<br>✅ Instance created successfully!";
+                } catch (e) {
+                    console.error("❌ Failed to create instance:", e);
+                    status.innerHTML += "<br>❌ Failed to create instance: " + e.message;
+                    status.style.color = "orange";
+                }
+            } else {
+                console.log("⏳ GBSDK not loaded yet, waiting...");
+                status.innerHTML = "⏳ Waiting for GBSDK...";
+                status.style.color = "orange";
+                setTimeout(checkGBSDK, 100);
+            }
+        }
+
+        // Start checking after a small delay
+        setTimeout(checkGBSDK, 100);
+    </script>
+</body>
+</html>
+

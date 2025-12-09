@@ -4,34 +4,84 @@ This guide shows how to integrate GBSDK into your Unity WebGL game using the pro
 
 ## 📦 Installation
 
-### Step 1: Download Files
+### Method 1: Using GameBuster WebGL Template (Recommended - Easiest!)
 
-Copy these files to your Unity project:
+1. **Copy the WebGL Template:**
+   - Copy the entire `WebGLTemplates/GameBuster/` folder to your Unity project's `Assets/` directory
+   - Result: `Assets/WebGLTemplates/GameBuster/`
 
-1. **GBSDK.cs** → `Assets/Scripts/` (or any Scripts folder)
-2. **GBSDK.jslib** → `Assets/Plugins/WebGL/`
+2. **Select the Template:**
+   - Go to `Edit → Project Settings → Player`
+   - Select the `WebGL` tab
+   - Under `Resolution and Presentation`, find `WebGL Template`
+   - Select `GameBuster` from the dropdown
 
-### Step 2: Include GBSDK Script in WebGL Template
+3. **Add GBSDK Scripts:**
+   - Copy `GBSDK.cs` → `Assets/Scripts/` (or any Scripts folder)
+   - Copy `GBSDK.jslib` → `Assets/Plugins/WebGL/`
 
-Add the GBSDK script to your WebGL template's `index.html`:
+4. **Done!** The template automatically includes the GBSDK script from CDN.
 
-```html
-<!DOCTYPE html>
-<html>
-<head>
-    <!-- Your existing head content -->
+**Features:**
+- ✅ Modern loading screen with GameBuster logo (from CDN)
+- ✅ Animated progress bar with shimmer effect
+- ✅ Real-time loading percentage display (0-100%)
+- ✅ Dynamic loading status messages
+- ✅ Smooth fade-out transition when loading completes
+- ✅ Beautiful purple gradient background
+- ✅ Pulsing logo animation
+- ✅ Fullscreen support
+- ✅ Mobile responsive
+- ✅ GBSDK auto-loaded from CDN
 
-    <!-- Add GBSDK script BEFORE Unity loader -->
-    <script src="https://unpkg.com/@game-buster/gbsdk@latest/dist/gbsdk.js"></script>
-</head>
-<body>
-    <!-- Your Unity content -->
-    <script>
-        // Unity WebGL loader code
-    </script>
-</body>
-</html>
+---
+
+### Method 2: Manual Installation (Custom Template)
+
+If you want to use your own WebGL template:
+
+1. **Add GBSDK Scripts:**
+   - Copy `GBSDK.cs` → `Assets/Scripts/`
+   - Copy `GBSDK.jslib` → `Assets/Plugins/WebGL/`
+
+2. **Modify Your WebGL Template:**
+
+   Add the GBSDK script to your template's `index.html` (BEFORE Unity loader):
+
+   ```html
+   <!DOCTYPE html>
+   <html>
+   <head>
+       <!-- Your existing head content -->
+
+       <!-- Add GBSDK script BEFORE Unity loader -->
+       <script src="https://cdn.game-buster.com/gbsdk.js"></script>
+   </head>
+   <body>
+       <!-- Your Unity content -->
+       <script>
+           // Unity WebGL loader code
+       </script>
+   </body>
+   </html>
+   ```
+
+---
+
+### Method 3: UPM Package (Unity Package Manager)
+
 ```
+1. Open Unity Package Manager (Window → Package Manager)
+2. Click the '+' button → Add package from git URL
+3. Enter: https://github.com/mertmisirlioglu/gbsdk.git?path=/bridges/unity
+4. Click 'Add'
+```
+
+The package includes:
+- ✅ GBSDK.cs (C# wrapper)
+- ✅ GBSDK.jslib (JavaScript bridge)
+- ✅ WebGL Template (pre-configured)
+- ✅ Example scripts
 
 ## 🚀 Basic Usage
 
@@ -43,14 +93,20 @@ using UnityEngine;
 
 public class AdManager : MonoBehaviour
 {
+    [SerializeField] private string configUrl = "https://your-cdn.com/ads/config.json";
+    [SerializeField] private bool debugMode = true;
+
     async void Start()
     {
-        // Initialize SDK (config automatically loaded from GameBuster)
-        bool success = await GBSDK.Initialize();
+        // Option 1: Auto-detection (Recommended - Zero Configuration!)
+        bool success = await GBSDK.Initialize(debugMode);
+
+        // Option 2: Custom configuration (Advanced usage)
+        // bool success = await GBSDK.Initialize(configUrl, debugMode);
 
         if (success)
         {
-            Debug.Log("GBSDK ready!");
+            Debug.Log("GBSDK ready with auto-detected game info!");
 
             // Track game session start
             GBSDK.GameStarted();
@@ -70,26 +126,9 @@ public class AdManager : MonoBehaviour
         // Unsubscribe from events
         GBSDK.OnInterstitialResult -= OnInterstitialResult;
         GBSDK.OnRewardedResult -= OnRewardedResult;
-
+        
         // Clean up
         GBSDK.Destroy();
-    }
-
-    private void OnInterstitialResult(GBSDK.AdResult result)
-    {
-        if (result.success)
-        {
-            Debug.Log("Interstitial completed");
-        }
-    }
-
-    private void OnRewardedResult(GBSDK.AdResult result)
-    {
-        if (result.success)
-        {
-            Debug.Log("Player earned reward");
-            // Grant reward
-        }
     }
 }
 ```
@@ -105,7 +144,7 @@ public class LevelManager : MonoBehaviour
         if (GBSDK.CanShow("interstitial"))
         {
             var result = await GBSDK.ShowInterstitial();
-
+            
             if (result.success)
             {
                 Debug.Log("Interstitial ad completed");
@@ -131,7 +170,7 @@ public class LevelManager : MonoBehaviour
 public class RewardSystem : MonoBehaviour
 {
     [SerializeField] private int rewardCoins = 100;
-
+    
     public async void WatchAdForReward()
     {
         if (!GBSDK.CanShow("rewarded"))
@@ -139,9 +178,9 @@ public class RewardSystem : MonoBehaviour
             Debug.Log("Rewarded ad not available");
             return;
         }
-
+        
         var result = await GBSDK.ShowRewarded();
-
+        
         if (result.success)
         {
             // Grant reward only on successful completion
@@ -153,12 +192,12 @@ public class RewardSystem : MonoBehaviour
             Debug.Log($"Rewarded ad failed: {result.reason}");
         }
     }
-
+    
     private void GrantReward()
     {
         // Add coins, lives, power-ups, etc.
         PlayerData.coins += rewardCoins;
-
+        
         // Update UI
         UIManager.Instance.UpdateCoinsDisplay();
     }
@@ -175,16 +214,16 @@ public class GameController : MonoBehaviour
         // Track when game starts
         GBSDK.GameStarted();
     }
-
+    
     public void OnGameOver()
     {
         // Track when game ends
         GBSDK.GameEnded();
-
+        
         // Show interstitial ad after game over
         ShowGameOverAd();
     }
-
+    
     private async void ShowGameOverAd()
     {
         if (GBSDK.CanShow("interstitial"))
@@ -195,7 +234,34 @@ public class GameController : MonoBehaviour
 }
 ```
 
-## 🎯 Event Handling
+## 🎯 Advanced Configuration
+
+### Full Configuration Options
+
+```csharp
+var config = new GBSDK.Config
+{
+    configUrl = "https://your-cdn.com/ads/config.json",
+    allowDomains = new string[] { "your-cdn.com" },
+    cooldownSec = 90,
+    sessionCap = 20,
+    debug = true,
+    
+    // Fallback VAST tags (optional)
+    interstitialTags = new string[]
+    {
+        "https://your-ad-server.com/vast/interstitial"
+    },
+    rewardedTags = new string[]
+    {
+        "https://your-ad-server.com/vast/rewarded"
+    }
+};
+
+bool success = await GBSDK.Initialize(config);
+```
+
+### Event Handling
 
 ```csharp
 public class AdEventHandler : MonoBehaviour
@@ -209,12 +275,12 @@ public class AdEventHandler : MonoBehaviour
         GBSDK.OnGameStarted += OnGameStarted;
         GBSDK.OnGameEnded += OnGameEnded;
     }
-
+    
     private void OnSDKInitialized()
     {
         Debug.Log("GBSDK is ready to show ads");
     }
-
+    
     private void OnInterstitialResult(GBSDK.AdResult result)
     {
         if (result.success)
@@ -228,7 +294,7 @@ public class AdEventHandler : MonoBehaviour
             // Handle failure (usually continue anyway)
         }
     }
-
+    
     private void OnRewardedResult(GBSDK.AdResult result)
     {
         if (result.success)
@@ -243,15 +309,17 @@ public class AdEventHandler : MonoBehaviour
             // Don't grant reward
         }
     }
-
+    
     private void OnGameStarted()
     {
         Debug.Log("Game session started");
+        // Analytics, session tracking, etc.
     }
-
+    
     private void OnGameEnded()
     {
         Debug.Log("Game session ended");
+        // Analytics, session tracking, etc.
     }
 }
 ```
@@ -279,9 +347,9 @@ Create a custom WebGL template with GBSDK:
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Unity WebGL Player | {{{ PRODUCT_NAME }}}</title>
-
+    
     <!-- GBSDK Script -->
-    <script src="https://unpkg.com/@game-buster/gbsdk@latest/dist/gbsdk.js"></script>
+    <script src="https://cdn.game-buster.com/gbsdk.js"></script>
 </head>
 <body>
     <div id="unity-container">
@@ -293,12 +361,12 @@ Create a custom WebGL template with GBSDK:
             </div>
         </div>
     </div>
-
+    
     <script>
         var container = document.querySelector("#unity-container");
         var canvas = document.querySelector("#unity-canvas");
         var loadingBar = document.querySelector("#unity-loading-bar");
-
+        
         // Unity WebGL loader configuration
         var buildUrl = "Build";
         var loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}";
@@ -317,7 +385,7 @@ Create a custom WebGL template with GBSDK:
             productName: "{{{ PRODUCT_NAME }}}",
             productVersion: "{{{ PRODUCT_VERSION }}}",
         };
-
+        
         // Load Unity
         var script = document.createElement("script");
         script.src = loaderUrl;
@@ -347,8 +415,8 @@ Create a custom WebGL template with GBSDK:
 
 #### Ads Not Showing
 - Check if `GBSDK.CanShow()` returns true
-- Verify cooldown periods (90 seconds default)
-- Verify session caps (20 ads per session default)
+- Verify cooldown periods and session caps
+- Test with debug mode enabled
 - Check browser console for errors
 
 #### Async/Await Issues
@@ -361,6 +429,16 @@ Create a custom WebGL template with GBSDK:
 - Editor will simulate ad results for testing
 - Always test in actual WebGL build
 
+### Debug Mode
+
+Enable debug logging to see detailed information:
+
+```csharp
+await GBSDK.Initialize(configUrl, debug: true);
+```
+
+This will show detailed logs in the browser console.
+
 ## 📱 Platform Support
 
 - **WebGL**: Full support ✅
@@ -368,56 +446,8 @@ Create a custom WebGL template with GBSDK:
 - **Mobile**: Not supported ❌
 - **Editor**: Simulation only (for testing) ⚠️
 
-## Best Practices
-
-### User Experience
-
-1. **Always check `CanShow()` before showing ads**
-   ```csharp
-   if (GBSDK.CanShow("rewarded")) {
-       await GBSDK.ShowRewarded();
-   }
-   ```
-
-2. **Don't punish players for ad failures**
-   ```csharp
-   var result = await GBSDK.ShowInterstitial();
-   LoadNextLevel(); // Continue regardless of ad result
-   ```
-
-3. **Show rewarded ads from user interaction**
-   ```csharp
-   public async void OnRewardButtonClick() {
-       var result = await GBSDK.ShowRewarded();
-       if (result.success) {
-           GrantReward();
-       }
-   }
-   ```
-
-### Game Integration
-
-1. **Track game sessions**
-   ```csharp
-   // When game starts
-   GBSDK.GameStarted();
-
-   // When game ends
-   GBSDK.GameEnded();
-   ```
-
-2. **Show interstitials at natural breaks**
-   - Between levels
-   - After game over
-   - When returning to menu
-
-3. **Use rewarded ads for optional benefits**
-   - Extra coins/lives
-   - Power-ups
-   - Unlocking content
-
 ## 🔗 Related Links
 
 - [GBSDK Main Documentation](../../README.md)
-- [GameBuster Platform](https://game-buster.com)
-- [GitHub Repository](https://github.com/game-buster/gbsdk)
+- [Remote Configuration Guide](../../README.md#remote-configuration)
+- [Troubleshooting Guide](../../README.md#troubleshooting)

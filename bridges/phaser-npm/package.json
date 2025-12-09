@@ -1,4 +1,4 @@
-{
+logo{
   "name": "@gamebuster/phaser-3",
   "version": "1.0.0",
   "description": "Phaser 3 integration for GameBuster SDK - Production-ready in-game ads with VAST 4.x + Google IMA support",
